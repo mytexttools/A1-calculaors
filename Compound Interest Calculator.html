@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compound Interest Calculator | Wealth Growth Analyzer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(0px);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 30px 55px -15px rgba(0, 0, 0, 0.4);
+        }
+        .input-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer;
+        }
+        .input-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #6366f1;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+            transition: transform 0.2s;
+        }
+        .input-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        .frequency-btn {
+            transition: all 0.25s ease;
+            border: 2px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
+        }
+        .frequency-btn.active {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 8px 20px -8px #6366f1;
+        }
+        .number-input {
+            transition: all 0.2s;
+        }
+        .number-input:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        .hover-scale {
+            transition: transform 0.2s;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+        .value-highlight {
+            animation: fadeSlideUp 0.5s ease-out;
+        }
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button {
+            opacity: 0.5;
+        }
+        .progress-bar {
+            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 antialiased">
+
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Header -->
+        <div class="text-center mb-10">
+            <div class="inline-block mb-3">
+                <div class="bg-white/10 backdrop-blur-sm rounded-full px-4 py-1 inline-flex items-center gap-2">
+                    <span class="text-yellow-300 text-sm">💰</span>
+                    <span class="text-white/80 text-sm font-medium">Wealth Growth Calculator</span>
+                </div>
+            </div>
+            <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-3 tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-200 bg-clip-text text-transparent">
+                Compound Interest Calculator
+            </h1>
+            <p class="text-indigo-200 text-lg max-w-2xl mx-auto">Watch your money grow exponentially with the power of compounding</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Input Section -->
+            <div class="glass-card p-7 lg:p-8">
+                <div class="flex items-center gap-3 mb-7">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <span class="text-white text-xl">📊</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Investment Details</h2>
+                </div>
+                
+                <!-- Principal Amount -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <span>💰</span> Principal Amount
+                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">₹</span>
+                    </label>
+                    <input type="number" id="input-principal" value="10000" 
+                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input"
+                        min="0" max="10000000" step="1000">
+                    <input type="range" id="slider-principal" min="0" max="1000000" step="1000" value="10000"
+                        class="input-slider mt-3">
+                </div>
+
+                <!-- Annual Interest Rate -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <span>📈</span> Annual Interest Rate
+                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">% p.a.</span>
+                    </label>
+                    <input type="number" id="input-rate" value="8" 
+                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input"
+                        min="0" max="30" step="0.5">
+                    <input type="range" id="slider-rate" min="0" max="30" step="0.5" value="8"
+                        class="input-slider mt-3">
+                </div>
+
+                <!-- Time Period -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <span>⏱️</span> Time Period
+                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">Years</span>
+                    </label>
+                    <input type="number" id="input-years" value="10" 
+                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input"
+                        min="0" max="50" step="1">
+                    <input type="range" id="slider-years" min="0" max="50" step="1" value="10"
+                        class="input-slider mt-3">
+                </div>
+
+                <!-- Additional Monthly Contribution -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <span>➕</span> Monthly Contribution
+                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">₹/month</span>
+                    </label>
+                    <input type="number" id="input-monthly" value="1000" 
+                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input"
+                        min="0" max="100000" step="500">
+                    <input type="range" id="slider-monthly" min="0" max="50000" step="500" value="1000"
+                        class="input-slider mt-3">
+                </div>
+
+                <!-- Compounding Frequency -->
+                <div class="mb-7">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <span>🔄</span> Compounding Frequency
+                    </label>
+                    <div class="grid grid-cols-3 gap-3">
+                        <button class="frequency-btn py-3 rounded-xl font-semibold text-sm" data-frequency="12" onclick="setFrequency('monthly', this)">
+                            📅 Monthly
+                        </button>
+                        <button class="frequency-btn py-3 rounded-xl font-semibold text-sm" data-frequency="4" onclick="setFrequency('quarterly', this)">
+                            📆 Quarterly
+                        </button>
+                        <button class="frequency-btn active py-3 rounded-xl font-semibold text-sm" data-frequency="1" onclick="setFrequency('yearly', this)">
+                            📅 Yearly
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Calculate Button -->
+                <button onclick="calculateCompoundInterest()" 
+                    class="w-full py-4 rounded-xl text-white font-bold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3">
+                    <span>✨</span> CALCULATE WEALTH <span>✨</span>
+                </button>
+
+                <!-- Info Text -->
+                <div class="mt-6 text-center text-xs text-gray-400 border-t pt-4">
+                    <span>Compound Interest = P(1 + r/n)^(nt) + PMT × ((1 + r/n)^(nt) - 1) / (r/n)</span>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="space-y-6">
+                
+                <!-- Main Results Card -->
+                <div class="glass-card p-7 hover-scale">
+                    <div class="flex items-center justify-between mb-5">
+                        <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                            <span>📈</span> Wealth Projection
+                        </h2>
+                        <div id="wealth-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">Active</div>
+                    </div>
+                    
+                    <!-- Final Amount -->
+                    <div class="text-center mb-6">
+                        <div class="relative inline-block">
+                            <div id="final-amount" class="text-6xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">₹0</div>
+                            <div class="absolute -top-2 -right-8 text-2xl">🏆</div>
+                        </div>
+                        <p class="text-gray-500 font-medium">Total Value After Investment Period</p>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-3 gap-3 mb-6">
+                        <div class="bg-gray-50 rounded-xl p-3 text-center">
+                            <p class="text-xs text-gray-500 uppercase">Total Invested</p>
+                            <p class="text-lg font-bold text-gray-800" id="total-invested">₹0</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-3 text-center">
+                            <p class="text-xs text-gray-500 uppercase">Total Interest</p>
+                            <p class="text-lg font-bold text-emerald-600" id="total-interest">₹0</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-xl p-3 text-center">
+                            <p class="text-xs text-gray-500 uppercase">Interest %</p>
+                            <p class="text-lg font-bold text-purple-600" id="interest-percent">0%</p>
+                        </div>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>Principal</span>
+                            <span id="growth-indicator">0% Growth</span>
+                        </div>
+                        <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                            <div id="growth-bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Year by Year Breakdown Card -->
+                <div class="glass-card p-6">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+                            <span class="text-indigo-600 text-sm">📅</span>
+                        </div>
+                        <h2 class="text-lg font-bold text-gray-800">Year-by-Year Growth</h2>
+                    </div>
+                    <div class="overflow-x-auto max-h-64 overflow-y-auto">
+                        <table class="w-full text-sm" id="yearly-table">
+                            <thead class="bg-gray-50 sticky top-0">
+                                <tr class="border-b border-gray-200">
+                                    <th class="text-left py-2 px-2 font-semibold text-gray-600">Year</th>
+                                    <th class="text-right py-2 px-2 font-semibold text-gray-600">Start Balance</th>
+                                    <th class="text-right py-2 px-2 font-semibold text-gray-600">End Balance</th>
+                                    <th class="text-right py-2 px-2 font-semibold text-gray-600">Interest Earned</th>
+                                </tr>
+                            </thead>
+                            <tbody id="yearly-tbody">
+                                <tr><td colspan="4" class="text-center py-4 text-gray-400">Calculate to see breakdown</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+            
+            <!-- Growth Chart -->
+            <div class="glass-card p-7">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                        <span class="text-white text-xl">📊</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800">Wealth Growth Curve</h2>
+                </div>
+                <div class="w-full h-80">
+                    <canvas id="growthChart"></canvas>
+                </div>
+                <p class="text-xs text-center text-gray-400 mt-3">Visualizing the power of compound interest over time</p>
+            </div>
+
+            <!-- Contribution vs Interest Pie Chart -->
+            <div class="glass-card p-7">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <span class="text-white text-xl">🥧</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800">Investment Composition</h2>
+                </div>
+                <div class="flex justify-center">
+                    <div class="w-64 h-64">
+                        <canvas id="compositionChart"></canvas>
+                    </div>
+                </div>
+                <div class="flex justify-center gap-6 mt-4 flex-wrap">
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-full bg-indigo-500"></div>
+                        <span class="text-sm text-gray-600">Your Contributions</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-full bg-emerald-500"></div>
+                        <span class="text-sm text-gray-600">Interest Earned</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Wisdom Section -->
+        <div class="glass-card p-7 mt-8">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                    <span class="text-white text-xl">💡</span>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Financial Wisdom</h2>
+            </div>
+            <div id="financial-tips" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <!-- Tips populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart instances
+        let growthChart = null;
+        let compositionChart = null;
+        let currentFrequency = 1; // 1 = yearly, 4 = quarterly, 12 = monthly
+        let frequencyName = 'yearly';
+
+        // Sync sliders with inputs
+        function syncInputs() {
+            const mappings = [
+                { input: 'principal', slider: 'slider-principal' },
+                { input: 'rate', slider: 'slider-rate' },
+                { input: 'years', slider: 'slider-years' },
+                { input: 'monthly', slider: 'slider-monthly' }
+            ];
+            
+            mappings.forEach(m => {
+                const input = document.getElementById(`input-${m.input}`);
+                const slider = document.getElementById(m.slider);
+                if (input && slider) {
+                    slider.addEventListener('input', () => input.value = slider.value);
+                    input.addEventListener('input', () => slider.value = input.value);
+                }
+            });
+        }
+
+        // Set compounding frequency
+        function setFrequency(type, element) {
+            const buttons = document.querySelectorAll('.frequency-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            
+            switch(type) {
+                case 'monthly':
+                    currentFrequency = 12;
+                    frequencyName = 'monthly';
+                    break;
+                case 'quarterly':
+                    currentFrequency = 4;
+                    frequencyName = 'quarterly';
+                    break;
+                case 'yearly':
+                    currentFrequency = 1;
+                    frequencyName = 'yearly';
+                    break;
+            }
+            calculateCompoundInterest();
+        }
+
+        // Calculate compound interest with monthly contributions
+        function calculateCompoundInterest() {
+            const principal = parseFloat(document.getElementById('input-principal').value);
+            const annualRate = parseFloat(document.getElementById('input-rate').value);
+            const years = parseFloat(document.getElementById('input-years').value);
+            const monthlyContribution = parseFloat(document.getElementById('input-monthly').value);
+            
+            const r = annualRate / 100;
+            const n = currentFrequency;
+            
+            let finalAmount = 0;
+            let yearlyData = [];
+            
+            // Calculate future value of principal
+            const principalFuture = principal * Math.pow(1 + r/n, n * years);
+            
+            // Calculate future value of monthly contributions
+            let contributionFuture = 0;
+            if (monthlyContribution > 0) {
+                const monthlyRate = r / 12;
+                const totalMonths = years * 12;
+                if (monthlyRate > 0) {
+                    contributionFuture = monthlyContribution * (Math.pow(1 + monthlyRate, totalMonths) - 1) / monthlyRate;
+                } else {
+                    contributionFuture = monthlyContribution * totalMonths;
+                }
+            }
+            
+            finalAmount = principalFuture + contributionFuture;
+            
+            // Calculate total invested
+            const totalInvested = principal + (monthlyContribution * years * 12);
+            const totalInterest = finalAmount - totalInvested;
+            const interestPercent = totalInvested > 0 ? ((totalInterest / totalInvested) * 100).toFixed(1) : 0;
+            
+            // Yearly breakdown for chart and table
+            yearlyData = [];
+            for (let year = 0; year <= years; year++) {
+                const principalAtYear = principal * Math.pow(1 + r/n, n * year);
+                let contributionsAtYear = 0;
+                if (monthlyContribution > 0) {
+                    const monthsPassed = year * 12;
+                    const monthlyRate = r / 12;
+                    if (monthlyRate > 0) {
+                        contributionsAtYear = monthlyContribution * (Math.pow(1 + monthlyRate, monthsPassed) - 1) / monthlyRate;
+                    } else {
+                        contributionsAtYear = monthlyContribution * monthsPassed;
+                    }
+                }
+                const totalAtYear = principalAtYear + contributionsAtYear;
+                const investedAtYear = principal + (monthlyContribution * year * 12);
+                const interestAtYear = totalAtYear - investedAtYear;
+                
+                yearlyData.push({
+                    year: year,
+                    startBalance: year === 0 ? principal : yearlyData[year-1]?.endBalance || principal,
+                    endBalance: totalAtYear,
+                    interestEarned: interestAtYear,
+                    invested: investedAtYear
+                });
+            }
+            
+            // Update UI
+            document.getElementById('final-amount').textContent = formatCurrency(finalAmount);
+            document.getElementById('total-invested').textContent = formatCurrency(totalInvested);
+            document.getElementById('total-interest').textContent = formatCurrency(totalInterest);
+            document.getElementById('interest-percent').textContent = `${interestPercent}%`;
+            
+            // Update progress bar
+            const growthPercent = totalInvested > 0 ? Math.min((finalAmount / totalInvested - 1) * 100, 100) : 0;
+            document.getElementById('growth-bar').style.width = `${Math.min(growthPercent, 100)}%`;
+            document.getElementById('growth-indicator').textContent = `${growthPercent.toFixed(1)}% Growth`;
+            
+            // Update badge based on interest
+            const badge = document.getElementById('wealth-badge');
+            if (totalInterest > totalInvested) {
+                badge.textContent = '🚀 Doubled!';
+                badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700';
+            } else if (totalInterest > 0) {
+                badge.textContent = '📈 Growing';
+                badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700';
+            } else {
+                badge.textContent = '💤 No Interest';
+                badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600';
+            }
+            
+            // Update yearly table
+            updateYearlyTable(yearlyData);
+            
+            // Update charts
+            updateGrowthChart(yearlyData);
+            updateCompositionChart(totalInvested, totalInterest);
+            updateFinancialTips(annualRate, years, monthlyContribution, totalInterest, totalInvested);
+        }
+        
+        // Update yearly breakdown table
+        function updateYearlyTable(yearlyData) {
+            const tbody = document.getElementById('yearly-tbody');
+            tbody.innerHTML = yearlyData.slice(1).map(data => `
+                <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                    <td class="py-2 px-2 font-semibold text-gray-700">Year ${data.year}</td>
+                    <td class="text-right py-2 px-2 text-gray-600">${formatCurrency(data.startBalance)}</td>
+                    <td class="text-right py-2 px-2 font-semibold text-indigo-600">${formatCurrency(data.endBalance)}</td>
+                    <td class="text-right py-2 px-2 text-emerald-600">+${formatCurrency(data.interestEarned)}</td>
+                </tr>
+            `).join('');
+            
+            if (yearlyData.length <= 1) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-400">Enter investment details to see breakdown</td></tr>';
+            }
+        }
+        
+        // Update growth chart
+        function updateGrowthChart(yearlyData) {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            const years = yearlyData.map(d => `Year ${d.year}`);
+            const balances = yearlyData.map(d => d.endBalance);
+            const invested = yearlyData.map(d => d.invested);
+            
+            if (growthChart) growthChart.destroy();
+            
+            growthChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [
+                        {
+                            label: 'Total Value',
+                            data: balances,
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#6366f1'
+                        },
+                        {
+                            label: 'Total Invested',
+                            data: invested,
+                            borderColor: '#a855f7',
+                            backgroundColor: 'rgba(168, 85, 247, 0.05)',
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            borderWidth: 2,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${formatCurrency(context.raw)}`;
+                                }
+                            }
+                        },
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrencyShort(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Update composition pie chart
+        function updateCompositionChart(totalInvested, totalInterest) {
+            const ctx = document.getElementById('compositionChart').getContext('2d');
+            if (compositionChart) compositionChart.destroy();
+            
+            compositionChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Your Contributions', 'Interest Earned'],
+                    datasets: [{
+                        data: [totalInvested, Math.max(totalInterest, 0)],
+                        backgroundColor: ['#6366f1', '#10b981'],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '55%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const total = totalInvested + Math.max(totalInterest, 0);
+                                    const percent = ((value / total) * 100).toFixed(1);
+                                    return `${context.label}: ${formatCurrency(value)} (${percent}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Update financial tips based on calculations
+        function updateFinancialTips(rate, years, monthly, totalInterest, totalInvested) {
+            const tipsContainer = document.getElementById('financial-tips');
+            const wealthRatio = totalInvested > 0 ? (totalInterest / totalInvested) : 0;
+            
+            let tips = [];
+            
+            if (rate >= 10) {
+                tips.push({
+                    icon: '🚀',
+                    title: 'High Return Rate!',
+                    desc: `Your ${rate}% return is excellent. Consider diversifying to maintain this growth sustainably.`,
+                    bg: 'from-green-50 to-emerald-50'
+                });
+            } else if (rate >= 6) {
+                tips.push({
+                    icon: '📈',
+                    title: 'Solid Returns',
+                    desc: `${rate}% is a healthy return. Consistent investing will build significant wealth over time.`,
+                    bg: 'from-indigo-50 to-purple-50'
+                });
+            } else {
+                tips.push({
+                    icon: '🐢',
+                    title: 'Conservative Growth',
+                    desc: `At ${rate}%, consider exploring higher-yield options like index funds for better long-term results.`,
+                    bg: 'from-blue-50 to-cyan-50'
+                });
+            }
+            
+            if (years >= 15) {
+                tips.push({
+                    icon: '⏳',
+                    title: 'Long-Term Advantage',
+                    desc: `${years} years of compounding is powerful! Your money has time to grow exponentially.`,
+                    bg: 'from-purple-50 to-pink-50'
+                });
+            } else if (years >= 5) {
+                tips.push({
+                    icon: '🎯',
+                    title: 'Mid-Term Strategy',
+                    desc: `${years} years is good. Increasing contributions now will dramatically boost your final amount.`,
+                    bg: 'from-amber-50 to-orange-50'
+                });
+            } else {
+                tips.push({
+                    icon: '⚡',
+                    title: 'Short-Term Horizon',
+                    desc: `With ${years} years, consider more aggressive contributions or higher-yield investments.`,
+                    bg: 'from-yellow-50 to-amber-50'
+                });
+            }
+            
+            if (monthly > 0) {
+                const futureValue = (monthly * 12 * years) * Math.pow(1 + rate/100, years/2);
+                tips.push({
+                    icon: '💪',
+                    title: 'Power of SIP',
+                    desc: `Your ₹${monthly.toLocaleString()}/month contribution will grow significantly. Increase it by 10% yearly for even better results.`,
+                    bg: 'from-emerald-50 to-teal-50'
+                });
+            } else {
+                tips.push({
+                    icon: '➕',
+                    title: 'Add Monthly Contributions',
+                    desc: 'Even small monthly additions can dramatically increase your final wealth through dollar-cost averaging.',
+                    bg: 'from-cyan-50 to-blue-50'
+                });
+            }
+            
+            tipsContainer.innerHTML = tips.map(tip => `
+                <div class="rounded-2xl p-5 bg-gradient-to-br ${tip.bg} border border-white/50 shadow-sm transition-all hover:shadow-md">
+                    <div class="text-4xl mb-3">${tip.icon}</div>
+                    <h3 class="font-extrabold text-gray-800 mb-2 text-lg">${tip.title}</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">${tip.desc}</p>
+                </div>
+            `).join('');
+        }
+        
+        // Format currency
+        function formatCurrency(value) {
+            if (value >= 10000000) {
+                return `₹${(value / 10000000).toFixed(2)}Cr`;
+            } else if (value >= 100000) {
+                return `₹${(value / 100000).toFixed(2)}L`;
+            } else if (value >= 1000) {
+                return `₹${(value / 1000).toFixed(1)}K`;
+            }
+            return `₹${Math.round(value).toLocaleString()}`;
+        }
+        
+        function formatCurrencyShort(value) {
+            if (value >= 10000000) return `${(value / 10000000).toFixed(1)}Cr`;
+            if (value >= 100000) return `${(value / 100000).toFixed(1)}L`;
+            if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
+            return value.toLocaleString();
+        }
+        
+        // Event listeners for real-time calculation
+        function setupRealTimeCalculation() {
+            const inputs = ['input-principal', 'input-rate', 'input-years', 'input-monthly'];
+            inputs.forEach(id => {
+                document.getElementById(id).addEventListener('input', () => calculateCompoundInterest());
+            });
+        }
+        
+        // Initialize
+        syncInputs();
+        setupRealTimeCalculation();
+        calculateCompoundInterest();
+    </script>
+</body>
+</html>
