@@ -1,1 +1,587 @@
-# A1-calculaors
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MyTextTools - Home</title>
+  <style>
+    /* ===== GLOBAL RESET & BASE STYLES ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+      color: #333;
+      line-height: 1.6;
+      padding-top: 80px;
+    }
+
+    /* ===== HEADER STYLES ===== */
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      z-index: 1000;
+      backdrop-filter: blur(10px);
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      font-size: 2rem;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 25px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    nav a:hover, nav a.active {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-2px);
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%) scaleX(0);
+      width: 70%;
+      height: 2px;
+      background: white;
+      transition: transform 0.3s ease;
+      border-radius: 2px;
+    }
+
+    nav a:hover::after {
+      transform: translateX(-50%) scaleX(1);
+    }
+
+    .mobile-toggle {
+      display: none;
+      font-size: 1.8rem;
+      color: white;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* ===== MAIN CONTAINER ===== */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+
+    /* ===== BOX BASE STYLES ===== */
+    .box {
+      border-radius: 20px;
+      padding: 1.8rem;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 220px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+
+    .box:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    .box-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: white;
+      position: relative;
+      z-index: 2;
+    }
+
+    .box-content {
+      color: rgba(255,255,255,0.95);
+      font-size: 1rem;
+      flex-grow: 1;
+      position: relative;
+      z-index: 2;
+    }
+
+    .box::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: inherit;
+      opacity: 0.92;
+      z-index: 1;
+      border-radius: inherit;
+    }
+
+    /* ===== BOX 1: Gradient Radial + Floating Animation ===== */
+    .box-1 {
+      background: radial-gradient(circle at 30% 30%, #ff6b6b, #ee5a24);
+      animation: float 6s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    /* ===== BOX 2: Glassmorphism + Blur ===== */
+    .box-2 {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #2c3e50;
+    }
+    .box-2 .box-title,
+    .box-2 .box-content {
+      color: #2c3e50;
+      text-shadow: 0 1px 2px rgba(255,255,255,0.5);
+    }
+    .box-2::before {
+      display: none;
+    }
+
+    /* ===== BOX 3: Diagonal Stripes Pattern ===== */
+    .box-3 {
+      background: repeating-linear-gradient(
+        45deg,
+        #6a11cb,
+        #6a11cb 20px,
+        #2575fc 20px,
+        #2575fc 40px
+      );
+    }
+
+    /* ===== BOX 4: Neon Glow Border ===== */
+    .box-4 {
+      background: #0f0c29;
+      border: 3px solid #00d2ff;
+      box-shadow: 
+        0 0 15px #00d2ff,
+        inset 0 0 20px rgba(0, 210, 255, 0.3);
+    }
+    .box-4:hover {
+      box-shadow: 
+        0 0 25px #00d2ff,
+        inset 0 0 30px rgba(0, 210, 255, 0.5);
+    }
+
+    /* ===== BOX 5: 3D Tilt Effect Container ===== */
+    .box-5 {
+      background: linear-gradient(135deg, #11998e, #38ef7d);
+      transform-style: preserve-3d;
+      perspective: 1000px;
+    }
+    .box-5 .box-content {
+      transform: translateZ(30px);
+    }
+
+    /* ===== BOX 6: Animated Gradient Background ===== */
+    .box-6 {
+      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: gradientBG 12s ease infinite;
+    }
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ===== BOX 7: Minimalist Card with Icon ===== */
+    .box-7 {
+      background: #fff;
+      color: #2d3436;
+      border-left: 6px solid #00cec9;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .box-7 .box-icon {
+      font-size: 3rem;
+      color: #00cec9;
+      min-width: 60px;
+      text-align: center;
+    }
+    .box-7 .box-title,
+    .box-7 .box-content {
+      color: #2d3436;
+    }
+    .box-7::before {
+      display: none;
+    }
+
+    /* ===== BOX 8: Dark Mode with Particle Effect (CSS-only) ===== */
+    .box-8 {
+      background: #1a1a2e;
+      color: #e6e6e6;
+    }
+    .box-8::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(white 1px, transparent 1px),
+        radial-gradient(white 1px, transparent 1px);
+      background-size: 50px 50px, 35px 35px;
+      background-position: 0 0, 25px 25px;
+      opacity: 0.08;
+      z-index: 1;
+      pointer-events: none;
+    }
+    .box-8 .box-title,
+    .box-8 .box-content {
+      color: #e6e6e6;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ===== BOX 9: Split Layout with Image Placeholder ===== */
+    .box-9 {
+      background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%);
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      align-items: center;
+    }
+    .box-9 .box-text {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .box-9 .box-visual {
+      background: rgba(255,255,255,0.3);
+      border-radius: 15px;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.5rem;
+      color: white;
+      font-weight: bold;
+      box-shadow: inset 0 0 20px rgba(255,255,255,0.2);
+    }
+    .box-9 .box-title,
+    .box-9 .box-content {
+      color: #1a1a2e;
+    }
+    .box-9::before {
+      display: none;
+    }
+
+    /* ===== BOX 10: Morphing Shape with Clip-Path ===== */
+    .box-10 {
+      background: linear-gradient(45deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1);
+      background-size: 300% 300%;
+      animation: morph 8s ease-in-out infinite;
+      clip-path: polygon(
+        10% 0%, 
+        90% 10%, 
+        100% 50%, 
+        85% 95%, 
+        50% 100%, 
+        15% 90%, 
+        0% 50%, 
+        15% 15%
+      );
+      border-radius: 0;
+    }
+    @keyframes morph {
+      0%, 100% { clip-path: polygon(10% 0%, 90% 10%, 100% 50%, 85% 95%, 50% 100%, 15% 90%, 0% 50%, 15% 15%); }
+      25% { clip-path: polygon(20% 5%, 85% 0%, 100% 45%, 90% 90%, 45% 100%, 5% 85%, 0% 45%, 10% 20%); }
+      50% { clip-path: polygon(15% 10%, 80% 5%, 95% 50%, 80% 95%, 40% 100%, 10% 80%, 5% 50%, 20% 25%); }
+      75% { clip-path: polygon(25% 0%, 90% 15%, 100% 55%, 75% 100%, 35% 95%, 0% 60%, 10% 30%, 15% 10%); }
+    }
+    .box-10 .box-title,
+    .box-10 .box-content {
+      color: #2d3436;
+      text-shadow: 0 1px 3px rgba(255,255,255,0.7);
+    }
+
+    /* ===== RESPONSIVE DESIGN ===== */
+    @media (max-width: 900px) {
+      nav ul {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background: linear-gradient(90deg, #6a11cb, #2575fc);
+        padding: 1.5rem;
+        gap: 1rem;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+      }
+      nav ul.show {
+        display: flex;
+      }
+      .mobile-toggle {
+        display: block;
+      }
+      .box-9 {
+        grid-template-columns: 1fr;
+      }
+      .box-10 {
+        clip-path: none;
+        border-radius: 20px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .container {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+      }
+      header {
+        padding: 1rem;
+      }
+      .logo {
+        font-size: 1.5rem;
+      }
+    }
+
+    /* ===== UTILITY & ANIMATION ===== */
+    .fade-in {
+      animation: fadeIn 0.6s ease-out forwards;
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+    .delay-6 { animation-delay: 0.6s; }
+    .delay-7 { animation-delay: 0.7s; }
+    .delay-8 { animation-delay: 0.8s; }
+    .delay-9 { animation-delay: 0.9s; }
+    .delay-10 { animation-delay: 1.0s; }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: #666;
+      font-size: 0.95rem;
+      margin-top: 2rem;
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+    footer a {
+      color: #6a11cb;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== HEADER ===== -->
+  <header>
+    <a href="#" class="logo">
+      <span class="logo-icon"> 🌐 AI</span>
+      Calculators
+    </a>
+    <button class="mobile-toggle" id="mobileToggle">☰</button>
+    <nav>
+      <ul id="navMenu">
+        <li><a href="#" class="active">Home</a></li>
+        <li><a href="https://mytexttools.github.io/invisible-text-generator/" target="_blank">new tool</a></li>
+        <li><a href="#">How to use</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">BLOG</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- ===== MAIN CONTENT: 10 UNIQUE BOXES ===== -->
+  <main class="container">
+    
+    <!-- Box 1: Floating Gradient -->
+    <div class="box box-1 fade-in delay-1">
+      <h3 class="box-title">
+📟      GST Calculator</h3>
+      <p class="box-content">know, what is your gst payout required this year and Accurately Calculate Your Goods and Services Tax (GST) in Just a Few Clicks.</p>
+    </div>
+
+    <!-- Box 2: Glassmorphism -->
+    <div class="box box-2 fade-in delay-2">
+      <h3 class="box-title">💸 Compound Interest Calculator</h3>
+         <p class="box-content">Calculate the Future Value of Your Investments with Precision AND Estimate Your Long-Term Wealth Growth Using Our Compound Interest Tool.</p>
+ </div>
+
+    <!-- Box 3: Striped Pattern -->
+    <div class="box box-3 fade-in delay-3">
+      <h3 class="box-title">
+💪 BMI Calculator
+</h3>
+      <p class="box-content">Find exactly what is your body mass index now and Understanding Your Health Metrics: A Professional Grade BMI Calculation Experience</p>
+    </div>
+
+    <!-- Box 4: Neon Glow -->
+    <div class="box box-4 fade-in delay-4">
+      <h3 class="box-title">💰SIP Calculator</h3>
+      <p class="box-content">Your data stays yours. End-to-end encryption and zero logging on all our text processing tools.</p>
+    </div>
+
+    <!-- Box 5: 3D Tilt -->
+    <div class="box box-5 fade-in delay-5">
+      <h3 class="box-title">🌐 Multi-Language</h3>
+      <p class="box-content">Translate, transliterate, and localize content across 100+ languages with human-level accuracy.</p>
+    </div>
+
+    <!-- Box 6: Animated Gradient -->
+    <div class="box box-6 fade-in delay-6">
+      <h3 class="box-title">🤖 AI Assistant</h3>
+      <p class="box-content">Get smart suggestions for writing, editing, and optimizing your content in real-time.</p>
+    </div>
+
+    <!-- Box 7: Minimalist Card -->
+    <div class="box box-7 fade-in delay-7">
+      <div class="box-icon">📄</div>
+      <div>
+        <h3 class="box-title">Document Tools</h3>
+        <p class="box-content">Merge, split, compress, and annotate PDFs and docs without installing software.</p>
+      </div>
+    </div>
+
+    <!-- Box 8: Dark Particle -->
+    <div class="box box-8 fade-in delay-8">
+      <h3 class="box-title">🌙 Dark Mode Ready</h3>
+      <p class="box-content">Easy on the eyes. All tools adapt to your system preference or let you choose manually.</p>
+    </div>
+
+    <!-- Box 9: Split Layout -->
+    <div class="box box-9 fade-in delay-9">
+      <div class="box-text">
+        <h3 class="box-title">📱 Mobile Optimized</h3>
+        <p class="box-content">Full functionality on any device. Tools work flawlessly on phones, tablets, and desktops.</p>
+      </div>
+      <div class="box-visual">📲</div>
+    </div>
+
+    <!-- Box 10: Morphing Shape -->
+    <div class="box box-10 fade-in delay-10">
+      <h3 class="box-title">✨ Invisible Text Generator</h3>
+      <p class="box-content">Create hidden text for social media, formatting tricks, or fun surprises. Try it now!</p>
+      <a href="https://mytexttools.github.io/invisible-text-generator/" 
+         target="_blank" 
+         style="margin-top: 1rem; display: inline-block; padding: 0.6rem 1.4rem; background: rgba(255,255,255,0.9); color: #6a11cb; border-radius: 30px; text-decoration: none; font-weight: 600; transition: all 0.3s; z-index: 3; position: relative;">
+        Launch Tool →
+      </a>
+    </div>
+
+  </main>
+
+  <!-- ===== FOOTER ===== -->
+  <footer>
+    <p>© 2026 MyTextTools. All rights reserved. | 
+       <a href="https://mytexttools.github.io/invisible-text-generator/" target="_blank">Invisible Text Generator</a> | 
+       <a href="#">Privacy Policy</a> | 
+       <a href="#">Terms of Service</a>
+    </p>
+  </footer>
+
+  <!-- ===== JAVASCRIPT ===== -->
+  <script>
+    // Mobile menu toggle
+    document.getElementById('mobileToggle').addEventListener('click', function() {
+      document.getElementById('navMenu').classList.toggle('show');
+    });
+
+    // Close mobile menu when clicking a link
+    document.querySelectorAll('#navMenu a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('navMenu').classList.remove('show');
+      });
+    });
+
+    // 3D Tilt Effect for Box 5 (enhancement)
+    const box5 = document.querySelector('.box-5');
+    if (box5) {
+      box5.addEventListener('mousemove', (e) => {
+        const rect = box5.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = (y - centerY) / 15;
+        const rotateY = (centerX - x) / 15;
+        box5.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`;
+      });
+      box5.addEventListener('mouseleave', () => {
+        box5.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+      });
+    }
+
+    // Intersection Observer for fade-in animations (fallback support)
+    document.addEventListener('DOMContentLoaded', () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.style.opacity = 1;
+            entry.target.style.transform = 'translateY(0)';
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.fade-in').forEach(el => {
+        el.style.opacity = 0;
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        observer.observe(el);
+      });
+    });
+  </script>
+
+</body>
+</html>
+
