@@ -430,8 +430,6 @@
       <span class="logo-icon"> 🌐 AI</span>
       Calculators
     </a>
-    <button class="mobile-toggle" id="mobileToggle">☰</button>
-    <nav>
       <ul id="navMenu">
         <li><a href="#" class="active">Home</a></li>
         <li><a href="https://mytexttools.github.io/invisible-text-generator/" target="_blank">new tool</a></li>
