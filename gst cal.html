@@ -3,188 +3,299 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GST Calculator</title>
+    <title>GST Calculator | Smart Tax Analyzer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://cdn.jsdelivr.net/npm/fontsource-roboto@4.0.0/index.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
         body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 100%);
             min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(0px);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 30px 55px -15px rgba(0, 0, 0, 0.4);
         }
         .input-slider {
             -webkit-appearance: none;
             width: 100%;
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 5px;
+            height: 6px;
+            background: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);
+            border-radius: 10px;
             outline: none;
+            cursor: pointer;
         }
         .input-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
-            background: #4f46e5;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-        }
-        .card {
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border: 2px solid #6366f1;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+            transition: transform 0.2s;
         }
-        .btn-calculate {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-            transition: all 0.3s ease;
-        }
-        .btn-calculate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.4);
-        }
-        .btn-calculate:active {
-            transform: translateY(0);
+        .input-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
         }
         .gst-rate-btn {
-            transition: all 0.2s ease;
+            transition: all 0.25s ease;
             border: 2px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
         }
         .gst-rate-btn.active {
-            background: #4f46e5;
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             color: white;
-            border-color: #4f46e5;
+            border-color: transparent;
+            box-shadow: 0 8px 20px -8px #6366f1;
         }
-        .gst-rate-btn:hover {
-            border-color: #4f46e5;
+        .gst-type-btn {
+            transition: all 0.2s ease;
+        }
+        .number-input {
+            transition: all 0.2s;
+        }
+        .number-input:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        .hover-scale {
+            transition: transform 0.2s;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+        .value-highlight {
+            animation: fadeSlideUp 0.5s ease-out;
+        }
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .progress-bar {
+            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button {
+            opacity: 0.5;
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-4 md:p-8 antialiased">
 
-    <div class="max-w-6xl mx-auto">
+    <div class="max-w-7xl mx-auto">
         
         <!-- Header -->
-        <div class="text-center mb-8">
-             <a href="index.html" 
-   class="inline-flex items-center justify-start text-sm font-medium text-black transition-colors duration-200">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-    </svg>
-    Back to home
-</a><h1 class="text-4xl font-bold text-white mb-2">🧾 GST Calculator</h1>
-            <p class="text-indigo-200">Calculate Goods & Services Tax easily</p>
+        <div class="text-center mb-10">
+            <div class="inline-block mb-3">
+                <div class="bg-white/10 backdrop-blur-sm rounded-full px-4 py-1 inline-flex items-center gap-2">
+                    <span class="text-yellow-300 text-sm">🧾</span>
+                    <span class="text-white/80 text-sm font-medium">Tax Compliance Tool</span>
+                </div>
+            </div>
+            <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-3 tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-200 bg-clip-text text-transparent">
+                GST Calculator
+            </h1>
+            <p class="text-indigo-200 text-lg max-w-2xl mx-auto">Calculate Goods & Services Tax instantly — exclusive or inclusive</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             
             <!-- Input Section -->
-            <div class="card p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-6">📊 Transaction Details</h2>
+            <div class="glass-card p-7 lg:p-8">
+                <div class="flex items-center gap-3 mb-7">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <span class="text-white text-xl">📊</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Transaction Details</h2>
+                </div>
                 
                 <!-- Initial Amount -->
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-600 mb-2">
-                        Initial Amount (₹)
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <span>💰</span> Invoice / Base Amount
+                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">₹</span>
                     </label>
-                    <input type="number" id="input-amount" value="10000" 
-                        class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none text-lg font-semibold"
-                        min="1" max="10000000">
-                    <input type="range" id="slider-amount" min="1" max="1000000" step="100" value="10000"
+                    <input type="number" id="input-amount" value="25000" 
+                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input"
+                        min="0" max="10000000" step="1000">
+                    <input type="range" id="slider-amount" min="0" max="1000000" step="1000" value="25000"
                         class="input-slider mt-3">
                 </div>
 
                 <!-- GST Rate Selection -->
                 <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-600 mb-2">
-                        GST Rate (%)
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <span>🏷️</span> GST Rate
+                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">%</span>
                     </label>
                     <div class="grid grid-cols-4 gap-2 mb-3">
-                        <button class="gst-rate-btn py-2 rounded-lg font-semibold" onclick="selectRate(5)">5%</button>
-                        <button class="gst-rate-btn py-2 rounded-lg font-semibold" onclick="selectRate(12)">12%</button>
-                        <button class="gst-rate-btn py-2 rounded-lg font-semibold active" onclick="selectRate(18)">18%</button>
-                        <button class="gst-rate-btn py-2 rounded-lg font-semibold" onclick="selectRate(28)">28%</button>
+                        <button class="gst-rate-btn py-2.5 rounded-xl font-semibold text-sm" onclick="selectRate(5)">5%</button>
+                        <button class="gst-rate-btn py-2.5 rounded-xl font-semibold text-sm" onclick="selectRate(12)">12%</button>
+                        <button class="gst-rate-btn py-2.5 rounded-xl font-semibold text-sm active" onclick="selectRate(18)">18%</button>
+                        <button class="gst-rate-btn py-2.5 rounded-xl font-semibold text-sm" onclick="selectRate(28)">28%</button>
                     </div>
                     <input type="number" id="input-rate" value="18" 
-                        class="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-indigo-500 focus:outline-none text-lg font-semibold"
-                        min="1" max="30" step="0.5">
-                    <input type="range" id="slider-rate" min="1" max="30" step="0.5" value="18"
+                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input"
+                        min="0" max="30" step="0.5">
+                    <input type="range" id="slider-rate" min="0" max="30" step="0.5" value="18"
                         class="input-slider mt-3">
                 </div>
 
-                <!-- GST Type -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-600 mb-2">
-                        GST Type
+                <!-- GST Type (Exclusive / Inclusive) -->
+                <div class="mb-7">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <span>⚙️</span> Calculation Mode
                     </label>
                     <div class="grid grid-cols-2 gap-3">
-                        <button id="btn-exclusive" class="gst-type-btn py-3 rounded-lg font-semibold border-2 border-indigo-500 bg-indigo-50 text-indigo-600" onclick="selectType('exclusive')">
-                            GST Exclusive
+                        <button id="btn-exclusive" class="gst-type-btn py-3 rounded-xl font-semibold text-sm border-2 border-indigo-500 bg-indigo-50 text-indigo-600 transition-all" onclick="selectType('exclusive')">
+                            ➕ GST Exclusive
                         </button>
-                        <button id="btn-inclusive" class="gst-type-btn py-3 rounded-lg font-semibold border-2 border-gray-200 text-gray-600" onclick="selectType('inclusive')">
-                            GST Inclusive
+                        <button id="btn-inclusive" class="gst-type-btn py-3 rounded-xl font-semibold text-sm border-2 border-gray-200 text-gray-600 transition-all" onclick="selectType('inclusive')">
+                            🔄 GST Inclusive
                         </button>
                     </div>
+                    <p class="text-xs text-gray-400 mt-2 text-center">
+                        <span id="mode-description">GST is added to the base amount</span>
+                    </p>
                 </div>
 
                 <!-- Calculate Button -->
                 <button onclick="calculateGST()" 
-                    class="btn-calculate w-full py-4 rounded-lg text-white font-bold text-lg mt-4">
-                    🧮 CALCULATE GST
+                    class="w-full py-4 rounded-xl text-white font-bold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3">
+                    <span>✨</span> CALCULATE GST <span>✨</span>
                 </button>
+
+                <!-- Info Text -->
+                <div class="mt-6 text-center text-xs text-gray-400 border-t pt-4">
+                    <span>GST Amount = (Base × Rate) [Exclusive] | GST = Total - (Total × 100/(100+Rate)) [Inclusive]</span>
+                </div>
             </div>
 
             <!-- Results Section -->
             <div class="space-y-6">
                 
-                <!-- Results Cards -->
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">💰 Tax Breakdown</h2>
+                <!-- Main Results Card -->
+                <div class="glass-card p-7 hover-scale">
+                    <div class="flex items-center justify-between mb-5">
+                        <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                            <span>💰</span> Tax Breakdown
+                        </h2>
+                        <div id="gst-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">Standard Rate</div>
+                    </div>
                     
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="text-center p-4 bg-indigo-50 rounded-xl">
+                    <!-- Final Amount Highlight -->
+                    <div class="text-center mb-6">
+                        <div class="relative inline-block">
+                            <div id="result-total" class="text-6xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">₹0</div>
+                            <div class="absolute -top-2 -right-8 text-2xl">🧾</div>
+                        </div>
+                        <p class="text-gray-500 font-medium">Total Invoice Value</p>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-3 gap-3 mb-6">
+                        <div class="bg-gray-50 rounded-xl p-3 text-center">
                             <p class="text-xs text-gray-500 uppercase">Net Amount</p>
-                            <p class="text-lg font-bold text-indigo-600" id="result-net">₹0</p>
+                            <p class="text-lg font-bold text-gray-800" id="result-net">₹0</p>
                         </div>
-                        <div class="text-center p-4 bg-orange-50 rounded-xl">
+                        <div class="bg-gray-50 rounded-xl p-3 text-center">
                             <p class="text-xs text-gray-500 uppercase">GST Amount</p>
-                            <p class="text-lg font-bold text-orange-600" id="result-gst">₹0</p>
+                            <p class="text-lg font-bold text-emerald-600" id="result-gst">₹0</p>
                         </div>
-                        <div class="text-center p-4 bg-emerald-50 rounded-xl">
-                            <p class="text-xs text-gray-500 uppercase">Total Amount</p>
-                            <p class="text-lg font-bold text-emerald-600" id="result-total">₹0</p>
+                        <div class="bg-gray-50 rounded-xl p-3 text-center">
+                            <p class="text-xs text-gray-500 uppercase">Tax Percentage</p>
+                            <p class="text-lg font-bold text-purple-600" id="tax-percent">0%</p>
+                        </div>
+                    </div>
+
+                    <!-- Visual Progress Bar (GST proportion) -->
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>Net Amount</span>
+                            <span id="gst-proportion-indicator">0% GST</span>
+                        </div>
+                        <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                            <div id="gst-progress-bar" class="h-full bg-gradient-to-r from-orange-500 to-pink-500 rounded-full progress-bar" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Pie Chart (Circle) -->
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">🥧 Amount Distribution</h2>
-                    <div class="flex justify-center">
-                        <div class="w-64 h-64">
+                <!-- Pie Chart & Comparison Graph combined elegant -->
+                <div class="glass-card p-6">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                            <span class="text-white text-xl">🥧</span>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">Amount Distribution</h2>
+                    </div>
+                    <div class="flex flex-col md:flex-row items-center justify-around gap-6">
+                        <div class="w-56 h-56">
                             <canvas id="pieChart"></canvas>
                         </div>
-                    </div>
-                    <div class="flex justify-center gap-6 mt-4">
-                        <div class="flex items-center gap-2">
-                            <div class="w-4 h-4 rounded-full bg-indigo-500"></div>
-                            <span class="text-sm text-gray-600">Net Amount</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-4 h-4 rounded-full bg-orange-400"></div>
-                            <span class="text-sm text-gray-600">GST Tax</span>
+                        <div class="flex flex-col gap-2">
+                            <div class="flex items-center gap-3">
+                                <div class="w-5 h-5 rounded-full bg-indigo-500"></div>
+                                <span class="text-gray-700 font-medium">Net Amount</span>
+                                <span id="legend-net" class="text-sm font-bold text-indigo-600">₹0</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="w-5 h-5 rounded-full bg-orange-400"></div>
+                                <span class="text-gray-700 font-medium">GST Tax</span>
+                                <span id="legend-gst" class="text-sm font-bold text-orange-600">₹0</span>
+                            </div>
+                            <div class="mt-3 pt-3 border-t border-gray-100">
+                                <div class="text-xs text-gray-400">Effective tax rate</div>
+                                <div class="text-xl font-bold text-gray-800" id="effective-rate">0%</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Tax Comparison Graph -->
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4">📊 GST Rate Comparison</h2>
-                    <div class="w-full h-64">
+                <!-- GST Rate Comparison Bar Chart -->
+                <div class="glass-card p-7">
+                    <div class="flex items-center gap-3 mb-5">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                            <span class="text-white text-xl">📊</span>
+                        </div>
+                        <h2 class="text-xl font-bold text-gray-800">GST Rate Comparison</h2>
+                    </div>
+                    <div class="w-full h-72">
                         <canvas id="comparisonChart"></canvas>
                     </div>
+                    <p class="text-xs text-center text-gray-400 mt-3">How different tax rates impact your transaction (based on net amount)</p>
                 </div>
+            </div>
+        </div>
 
+        <!-- Bottom Section: GST Slab Info & Financial Insight -->
+        <div class="glass-card p-7 mt-8">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+                    <span class="text-white text-xl">💡</span>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">GST Insights</h2>
+            </div>
+            <div id="gst-insights" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <!-- Dynamic tips based on current calculation -->
             </div>
         </div>
     </div>
@@ -193,124 +304,150 @@
         // Chart instances
         let pieChart = null;
         let comparisonChart = null;
-
-        // Current state
+        
+        // State
         let currentRate = 18;
         let currentType = 'exclusive';
-
-        // Sync sliders with inputs
+        
+        // Sync sliders with number inputs
         function syncInputs() {
             const amountInput = document.getElementById('input-amount');
             const amountSlider = document.getElementById('slider-amount');
             const rateInput = document.getElementById('input-rate');
             const rateSlider = document.getElementById('slider-rate');
-
+            
             amountSlider.addEventListener('input', () => {
                 amountInput.value = amountSlider.value;
+                calculateGST();
             });
             amountInput.addEventListener('input', () => {
                 amountSlider.value = amountInput.value;
+                calculateGST();
             });
             
             rateSlider.addEventListener('input', () => {
                 rateInput.value = rateSlider.value;
                 currentRate = parseFloat(rateSlider.value);
                 updateRateButtons();
+                calculateGST();
             });
             rateInput.addEventListener('input', () => {
                 rateSlider.value = rateInput.value;
                 currentRate = parseFloat(rateInput.value);
                 updateRateButtons();
+                calculateGST();
             });
         }
-
-        // Format currency
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-IN', {
-                style: 'currency',
-                currency: 'INR',
-                maximumFractionDigits: 0
-            }).format(amount);
-        }
-
-        // Select GST Rate
-        function selectRate(rate) {
-            currentRate = rate;
-            document.getElementById('input-rate').value = rate;
-            document.getElementById('slider-rate').value = rate;
-            updateRateButtons();
-        }
-
-        // Update rate buttons styling
+        
+        // Update GST rate button styles
         function updateRateButtons() {
             const buttons = document.querySelectorAll('.gst-rate-btn');
             buttons.forEach(btn => {
                 const rate = parseInt(btn.textContent);
-                if (rate === currentRate) {
+                if (Math.abs(rate - currentRate) < 0.1) {
                     btn.classList.add('active');
                 } else {
                     btn.classList.remove('active');
                 }
             });
         }
-
-        // Select GST Type
+        
+        // Select rate from preset buttons
+        function selectRate(rate) {
+            currentRate = rate;
+            document.getElementById('input-rate').value = rate;
+            document.getElementById('slider-rate').value = rate;
+            updateRateButtons();
+            calculateGST();
+        }
+        
+        // Select GST Type (exclusive/inclusive)
         function selectType(type) {
             currentType = type;
             const btnExclusive = document.getElementById('btn-exclusive');
             const btnInclusive = document.getElementById('btn-inclusive');
+            const modeDesc = document.getElementById('mode-description');
             
             if (type === 'exclusive') {
                 btnExclusive.classList.add('border-indigo-500', 'bg-indigo-50', 'text-indigo-600');
                 btnExclusive.classList.remove('border-gray-200', 'text-gray-600');
                 btnInclusive.classList.remove('border-indigo-500', 'bg-indigo-50', 'text-indigo-600');
                 btnInclusive.classList.add('border-gray-200', 'text-gray-600');
+                modeDesc.textContent = 'GST is added to the base amount. Enter taxable value → Total = Net + GST';
             } else {
                 btnInclusive.classList.add('border-indigo-500', 'bg-indigo-50', 'text-indigo-600');
                 btnInclusive.classList.remove('border-gray-200', 'text-gray-600');
                 btnExclusive.classList.remove('border-indigo-500', 'bg-indigo-50', 'text-indigo-600');
                 btnExclusive.classList.add('border-gray-200', 'text-gray-600');
+                modeDesc.textContent = 'GST is included in the total. Enter final invoice value → Back-calculated Net & GST';
             }
+            calculateGST();
         }
-
-        // Calculate GST
+        
+        // Core GST Calculation
         function calculateGST() {
-            const amount = parseFloat(document.getElementById('input-amount').value);
-            const rate = parseFloat(document.getElementById('input-rate').value);
+            const amount = parseFloat(document.getElementById('input-amount').value) || 0;
+            const rate = parseFloat(document.getElementById('input-rate').value) || 0;
             currentRate = rate;
-
-            let netAmount, gstAmount, totalAmount;
-
+            
+            let netAmount = 0, gstAmount = 0, totalAmount = 0;
+            
             if (currentType === 'exclusive') {
-                // GST Exclusive: Add GST to the amount
                 netAmount = amount;
                 gstAmount = (amount * rate) / 100;
                 totalAmount = amount + gstAmount;
             } else {
-                // GST Inclusive: Extract GST from the amount
+                // GST Inclusive: amount is total invoice value
                 totalAmount = amount;
                 netAmount = (amount * 100) / (100 + rate);
                 gstAmount = totalAmount - netAmount;
             }
-
-            // Update results
+            
+            // Update DOM elements
             document.getElementById('result-net').textContent = formatCurrency(netAmount);
             document.getElementById('result-gst').textContent = formatCurrency(gstAmount);
             document.getElementById('result-total').textContent = formatCurrency(totalAmount);
-
+            
+            const taxPercentDisplay = (totalAmount > 0) ? ((gstAmount / totalAmount) * 100).toFixed(2) : 0;
+            document.getElementById('tax-percent').textContent = `${taxPercentDisplay}%`;
+            document.getElementById('effective-rate').textContent = `${taxPercentDisplay}%`;
+            
+            // Update legend values
+            document.getElementById('legend-net').textContent = formatCurrency(netAmount);
+            document.getElementById('legend-gst').textContent = formatCurrency(gstAmount);
+            
+            // Update progress bar (GST proportion relative to total)
+            const gstRatio = totalAmount > 0 ? (gstAmount / totalAmount) * 100 : 0;
+            document.getElementById('gst-progress-bar').style.width = `${Math.min(gstRatio, 100)}%`;
+            document.getElementById('gst-proportion-indicator').textContent = `${gstRatio.toFixed(1)}% Tax Component`;
+            
+            // Update badge based on rate
+            const badge = document.getElementById('gst-badge');
+            if (rate >= 28) {
+                badge.textContent = '🔴 Luxury Slab (28%)';
+                badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700';
+            } else if (rate >= 18) {
+                badge.textContent = '🟠 Standard Slab (18%)';
+                badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-700';
+            } else if (rate >= 12) {
+                badge.textContent = '🟡 Reduced Slab (12%)';
+                badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-amber-100 text-amber-700';
+            } else {
+                badge.textContent = '🟢 Lower Slab (5%)';
+                badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700';
+            }
+            
             // Update charts
             updatePieChart(netAmount, gstAmount);
-            updateComparisonChart(netAmount, rate);
+            updateComparisonChart(netAmount);
+            updateGSTInsights(rate, netAmount, gstAmount, totalAmount, currentType);
         }
-
-        // Update Pie Chart (Circle)
+        
+        // Doughnut Pie Chart
         function updatePieChart(netAmount, gstAmount) {
             const ctx = document.getElementById('pieChart').getContext('2d');
+            if (pieChart) pieChart.destroy();
             
-            if (pieChart) {
-                pieChart.destroy();
-            }
-
             pieChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
@@ -324,19 +461,17 @@
                 },
                 options: {
                     responsive: true,
-                    maintainAspectRatio: false,
+                    maintainAspectRatio: true,
                     cutout: '60%',
                     plugins: {
-                        legend: {
-                            display: false
-                        },
+                        legend: { display: false },
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
                                     const value = context.raw;
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = ((value / total) * 100).toFixed(1);
-                                    return formatCurrency(value) + ` (${percentage}%)`;
+                                    const total = netAmount + gstAmount;
+                                    const percent = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return `${context.label}: ${formatCurrency(value)} (${percent}%)`;
                                 }
                             }
                         }
@@ -344,20 +479,19 @@
                 }
             });
         }
-
-        // Update Comparison Chart (Graph)
-        function updateComparisonChart(baseAmount, currentRate) {
+        
+        // Comparison Bar Chart: shows GST & Total for different rates based on current net amount
+        function updateComparisonChart(baseNetAmount) {
             const ctx = document.getElementById('comparisonChart').getContext('2d');
-            
             const rates = [5, 12, 18, 28];
             const labels = rates.map(r => `${r}% GST`);
-            const gstAmounts = rates.map(r => (baseAmount * r) / 100);
-            const totalAmounts = rates.map(r => baseAmount + (baseAmount * r) / 100);
-
-            if (comparisonChart) {
-                comparisonChart.destroy();
-            }
-
+            
+            // For exclusive comparison: We show GST amount and total amount (Net + GST) for each rate based on same net amount
+            const gstAmounts = rates.map(r => (baseNetAmount * r) / 100);
+            const totalAmounts = rates.map(r => baseNetAmount + (baseNetAmount * r) / 100);
+            
+            if (comparisonChart) comparisonChart.destroy();
+            
             comparisonChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -366,18 +500,20 @@
                         {
                             label: 'GST Amount',
                             data: gstAmounts,
-                            backgroundColor: 'rgba(251, 146, 60, 0.8)',
+                            backgroundColor: 'rgba(251, 146, 60, 0.85)',
                             borderColor: '#fb923c',
                             borderWidth: 1,
-                            borderRadius: 4
+                            borderRadius: 8,
+                            barPercentage: 0.65
                         },
                         {
-                            label: 'Total Amount',
+                            label: 'Total Amount (Net + GST)',
                             data: totalAmounts,
-                            backgroundColor: 'rgba(99, 102, 241, 0.8)',
+                            backgroundColor: 'rgba(99, 102, 241, 0.85)',
                             borderColor: '#6366f1',
                             borderWidth: 1,
-                            borderRadius: 4
+                            borderRadius: 8,
+                            barPercentage: 0.65
                         }
                     ]
                 },
@@ -389,7 +525,7 @@
                             beginAtZero: true,
                             ticks: {
                                 callback: function(value) {
-                                    return '₹' + (value / 1000).toFixed(0) + 'K';
+                                    return formatCurrencyShort(value);
                                 }
                             }
                         }
@@ -398,23 +534,102 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return context.dataset.label + ': ' + formatCurrency(context.raw);
+                                    return `${context.dataset.label}: ${formatCurrency(context.raw)}`;
                                 }
                             }
                         },
-                        legend: {
-                            position: 'top'
-                        }
+                        legend: { position: 'top' }
                     }
                 }
             });
         }
-
+        
+        // Dynamic Insights (financial wisdom)
+        function updateGSTInsights(rate, netAmount, gstAmount, totalAmount, type) {
+            const container = document.getElementById('gst-insights');
+            const insights = [];
+            
+            // Tax impact tip
+            if (rate >= 18) {
+                insights.push({
+                    icon: '⚡',
+                    title: 'Higher Tax Impact',
+                    desc: `${rate}% GST adds significant cost. For B2B, claim ITC (Input Tax Credit). Consider HSN/SAC compliance.`,
+                    bg: 'from-orange-50 to-red-50'
+                });
+            } else {
+                insights.push({
+                    icon: '🌿',
+                    title: 'Lower GST Advantage',
+                    desc: `${rate}% is favorable for essential goods. Use this to price competitively while staying compliant.`,
+                    bg: 'from-green-50 to-emerald-50'
+                });
+            }
+            
+            // Mode specific insight
+            if (type === 'exclusive') {
+                insights.push({
+                    icon: '📑',
+                    title: 'Exclusive Mode',
+                    desc: `You're adding GST on top of ${formatCurrency(netAmount)}. Great for quoting before tax. Always mention "plus GST" on invoices.`,
+                    bg: 'from-indigo-50 to-purple-50'
+                });
+            } else {
+                insights.push({
+                    icon: '🔄',
+                    title: 'Inclusive Mode',
+                    desc: `Total invoice ₹${formatCurrencyShort(totalAmount)} includes ₹${formatCurrencyShort(gstAmount)} tax. Useful for retail/MRP pricing.`,
+                    bg: 'from-cyan-50 to-blue-50'
+                });
+            }
+            
+            // Tax planning
+            const taxBurdenPercent = ((gstAmount / totalAmount) * 100).toFixed(1);
+            insights.push({
+                icon: '🧠',
+                title: 'Tax Planning',
+                desc: `Effective tax rate: ${taxBurdenPercent}%. For registered businesses, file GSTR-3B monthly. GST can be a cash flow factor.`,
+                bg: 'from-yellow-50 to-amber-50'
+            });
+            
+            container.innerHTML = insights.map(insight => `
+                <div class="rounded-2xl p-5 bg-gradient-to-br ${insight.bg} border border-white/50 shadow-sm transition-all hover:shadow-md">
+                    <div class="text-4xl mb-3">${insight.icon}</div>
+                    <h3 class="font-extrabold text-gray-800 mb-2 text-lg">${insight.title}</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">${insight.desc}</p>
+                </div>
+            `).join('');
+        }
+        
+        // Format helpers
+        function formatCurrency(value) {
+            if (isNaN(value)) return '₹0';
+            if (value >= 10000000) {
+                return `₹${(value / 10000000).toFixed(2)}Cr`;
+            } else if (value >= 100000) {
+                return `₹${(value / 100000).toFixed(2)}L`;
+            } else if (value >= 1000) {
+                return `₹${(value / 1000).toFixed(1)}K`;
+            }
+            return `₹${Math.round(value).toLocaleString()}`;
+        }
+        
+        function formatCurrencyShort(value) {
+            if (value >= 10000000) return `${(value / 10000000).toFixed(1)}Cr`;
+            if (value >= 100000) return `${(value / 100000).toFixed(1)}L`;
+            if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
+            return value.toLocaleString();
+        }
+        
         // Initialize
-        syncInputs();
-        updateRateButtons();
-        calculateGST();
+        function init() {
+            syncInputs();
+            updateRateButtons();
+            selectType('exclusive'); // default exclusive mode
+            calculateGST();
+        }
+        
+        init();
     </script>
 </body>
 </html>
-
