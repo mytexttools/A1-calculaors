@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BMI Calculator | Advanced Health Analyzer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+        body {
+            background: linear-gradient(145deg, #0f172a 0%, #1e1b4b 100%);
+            min-height: 100vh;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(0px);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 30px 55px -15px rgba(0, 0, 0, 0.4);
+        }
+        .input-slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);
+            border-radius: 10px;
+            outline: none;
+            cursor: pointer;
+        }
+        .input-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: white;
+            border: 2px solid #6366f1;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(99, 102, 241, 0.4);
+            transition: transform 0.2s;
+        }
+        .input-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+        .gender-btn {
+            transition: all 0.25s ease;
+            border: 2px solid #e2e8f0;
+            background: white;
+            cursor: pointer;
+        }
+        .gender-btn.active {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 8px 20px -8px #6366f1;
+        }
+        .bmi-marker-pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
+        .number-input {
+            transition: all 0.2s;
+        }
+        .number-input:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+        .bmi-category-badge {
+            transition: all 0.3s ease;
+        }
+        .hover-scale {
+            transition: transform 0.2s;
+        }
+        .hover-scale:hover {
+            transform: scale(1.02);
+        }
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button {
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 antialiased">
+
+    <div class="max-w-7xl mx-auto">
+        
+        <!-- Header with animated gradient -->
+        <div class="text-center mb-10">
+            <div class="inline-block mb-3">
+                <div class="bg-white/10 backdrop-blur-sm rounded-full px-4 py-1 inline-flex items-center gap-2">
+                    <span class="text-yellow-300 text-sm">⚡</span>
+                    <span class="text-white/80 text-sm font-medium">AI-Powered Health Analyzer</span>
+                </div>
+            </div>
+            <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-3 tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-200 bg-clip-text text-transparent">
+                BMI Calculator
+            </h1>
+            <p class="text-indigo-200 text-lg max-w-2xl mx-auto">Your comprehensive body composition analysis with personalized insights</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Input Section - Enhanced -->
+            <div class="glass-card p-7 lg:p-8">
+                <div class="flex items-center gap-3 mb-7">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <span class="text-white text-xl">📋</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-gray-800">Your Details</h2>
+                </div>
+                
+                <!-- Gender Selection with icons animation -->
+                <div class="mb-7">
+                    <label class="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                        <span>👤</span> Gender
+                    </label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <button id="btn-male" class="gender-btn active py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 text-gray-700" onclick="selectGender('male')">
+                            <span>👨</span> Male
+                        </button>
+                        <button id="btn-female" class="gender-btn py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 text-gray-700" onclick="selectGender('female')">
+                            <span>👩</span> Female
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Age with better styling -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <span>🎂</span> Age (Years)
+                    </label>
+                    <input type="number" id="input-age" value="25" 
+                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input transition-all"
+                        min="1" max="120">
+                    <input type="range" id="slider-age" min="1" max="120" step="1" value="25"
+                        class="input-slider mt-3">
+                </div>
+
+                <!-- Weight with unit indicator -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <span>⚖️</span> Weight
+                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">kg</span>
+                    </label>
+                    <input type="number" id="input-weight" value="70" 
+                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input"
+                        min="20" max="200" step="0.5">
+                    <input type="range" id="slider-weight" min="20" max="200" step="0.5" value="70"
+                        class="input-slider mt-3">
+                </div>
+
+                <!-- Height with unit indicator -->
+                <div class="mb-7">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <span>📏</span> Height
+                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">cm</span>
+                    </label>
+                    <input type="number" id="input-height" value="170" 
+                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input"
+                        min="50" max="250">
+                    <input type="range" id="slider-height" min="50" max="250" step="1" value="170"
+                        class="input-slider mt-3">
+                </div>
+
+                <!-- Calculate Button with ripple effect -->
+                <button onclick="calculateBMI()" 
+                    class="w-full py-4 rounded-xl text-white font-bold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3">
+                    <span>✨</span> ANALYZE MY BMI <span>✨</span>
+                </button>
+
+                <!-- Quick Info -->
+                <div class="mt-6 text-center text-xs text-gray-400 border-t pt-4">
+                    <span>BMI = weight(kg) / height(m)² | World Health Organization Standards</span>
+                </div>
+            </div>
+
+            <!-- Results Section - Enhanced -->
+            <div class="space-y-6">
+                
+                <!-- Main BMI Card with animated display -->
+                <div class="glass-card p-7 hover-scale">
+                    <div class="flex items-center justify-between mb-5">
+                        <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+                            <span>📊</span> BMI Result
+                        </h2>
+                        <div id="bmi-status-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">Ready</div>
+                    </div>
+                    
+                    <div class="text-center mb-6">
+                        <div class="relative inline-block">
+                            <div id="bmi-display" class="text-7xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">0.0</div>
+                            <div class="absolute -top-2 -right-8 text-2xl">🏷️</div>
+                        </div>
+                        <p class="text-gray-500 font-medium">Body Mass Index</p>
+                    </div>
+
+                    <!-- Enhanced BMI Scale -->
+                    <div class="bg-gray-100 rounded-2xl p-5 mb-5">
+                        <div class="flex justify-between items-center mb-3 text-xs font-semibold">
+                            <span class="text-blue-600">Underweight</span>
+                            <span class="text-green-600">Normal</span>
+                            <span class="text-yellow-600">Overweight</span>
+                            <span class="text-red-600">Obese</span>
+                        </div>
+                        <div class="h-3 rounded-full bg-gradient-to-r from-blue-400 via-green-400 via-yellow-400 to-red-500 relative">
+                            <div id="bmi-marker" class="absolute top-1/2 transform -translate-y-1/2 w-5 h-5 bg-white border-3 border-indigo-600 rounded-full shadow-lg bmi-marker-pulse" style="left: 0%;"></div>
+                        </div>
+                        <div class="flex justify-between mt-2 text-xs text-gray-500">
+                            <span>&lt;18.5</span>
+                            <span>18.5–24.9</span>
+                            <span>25–29.9</span>
+                            <span>≥30</span>
+                        </div>
+                    </div>
+
+                    <div id="bmi-category" class="text-center py-4 rounded-2xl font-bold text-xl transition-all duration-300 bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700">
+                        Calculating...
+                    </div>
+                </div>
+
+                <!-- Enhanced Stats Cards with icons -->
+                <div class="grid grid-cols-2 gap-5">
+                    <div class="glass-card p-5 text-center hover-scale">
+                        <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
+                            <span class="text-2xl">🎯</span>
+                        </div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold tracking-wide">Ideal Range</p>
+                        <p class="text-xl font-black text-emerald-600 mt-1" id="result-ideal">0 - 0 kg</p>
+                    </div>
+                    <div class="glass-card p-5 text-center hover-scale">
+                        <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-3">
+                            <span class="text-2xl">📉</span>
+                        </div>
+                        <p class="text-xs text-gray-500 uppercase font-semibold tracking-wide">Adjustment</p>
+                        <p class="text-xl font-black text-orange-600 mt-1" id="result-diff">0 kg</p>
+                    </div>
+                </div>
+
+                <!-- Body Fat Estimate (New Feature) -->
+                <div class="glass-card p-5">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold text-gray-800 flex items-center gap-2">
+                            <span>💪</span> Body Fat Estimate
+                        </h3>
+                        <span class="text-xs bg-gray-100 px-2 py-1 rounded-full">Navy Method</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <p class="text-3xl font-black text-indigo-600" id="body-fat-estimate">--%</p>
+                            <p class="text-xs text-gray-500">Estimated body fat percentage</p>
+                        </div>
+                        <div class="w-24 h-24">
+                            <canvas id="fatGaugeChart" width="100" height="100"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BMI Trends Chart -->
+                <div class="glass-card p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                        <span>📈</span> BMI Categories Overview
+                    </h2>
+                    <div class="w-full h-64">
+                        <canvas id="bmiChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Enhanced Health Tips Section with dynamic backgrounds -->
+        <div class="glass-card p-7 mt-8">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
+                    <span class="text-white text-xl">💡</span>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-800">Personalized Health Insights</h2>
+            </div>
+            <div id="health-tips" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <!-- Tips populated dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Chart instances
+        let bmiChart = null;
+        let fatGaugeChart = null;
+        let currentGender = 'male';
+
+        // Sync inputs with sliders
+        function syncInputs() {
+            const inputs = ['age', 'weight', 'height'];
+            inputs.forEach(param => {
+                const input = document.getElementById(`input-${param}`);
+                const slider = document.getElementById(`slider-${param}`);
+                if (input && slider) {
+                    slider.addEventListener('input', () => input.value = slider.value);
+                    input.addEventListener('input', () => slider.value = input.value);
+                }
+            });
+        }
+
+        // Select Gender
+        function selectGender(gender) {
+            currentGender = gender;
+            const btnMale = document.getElementById('btn-male');
+            const btnFemale = document.getElementById('btn-female');
+            
+            if (gender === 'male') {
+                btnMale.classList.add('active');
+                btnFemale.classList.remove('active');
+            } else {
+                btnFemale.classList.add('active');
+                btnMale.classList.remove('active');
+            }
+            calculateBMI();
+        }
+
+        // Estimate Body Fat (Navy Method simplified)
+        function estimateBodyFat(bmi, age, gender) {
+            let bodyFat;
+            if (gender === 'male') {
+                bodyFat = (1.20 * bmi) + (0.23 * age) - 16.2;
+            } else {
+                bodyFat = (1.20 * bmi) + (0.23 * age) - 5.4;
+            }
+            bodyFat = Math.min(Math.max(bodyFat, 5), 45);
+            return Math.round(bodyFat * 10) / 10;
+        }
+
+        // Update Fat Gauge
+        function updateFatGauge(percentage) {
+            const canvas = document.getElementById('fatGaugeChart');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            if (fatGaugeChart) fatGaugeChart.destroy();
+            
+            fatGaugeChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    datasets: [{
+                        data: [percentage, 100 - percentage],
+                        backgroundColor: ['#6366f1', '#e2e8f0'],
+                        borderWidth: 0,
+                        cutout: '70%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                }
+            });
+        }
+
+        // Calculate BMI and all metrics
+        function calculateBMI() {
+            const weight = parseFloat(document.getElementById('input-weight').value);
+            const height = parseFloat(document.getElementById('input-height').value);
+            const age = parseFloat(document.getElementById('input-age').value);
+            const heightInMeters = height / 100;
+            const bmi = weight / (heightInMeters * heightInMeters);
+            const bmiRounded = Math.round(bmi * 10) / 10;
+
+            // Enhanced category with severity
+            let category, categoryColor, healthPercentage, gradientClass, emoji;
+            if (bmi < 18.5) {
+                category = 'Underweight';
+                categoryColor = 'blue';
+                healthPercentage = 55;
+                emoji = '⚠️';
+                gradientClass = 'from-blue-50 to-blue-100 text-blue-700';
+            } else if (bmi >= 18.5 && bmi < 25) {
+                category = 'Normal Weight';
+                categoryColor = 'green';
+                healthPercentage = 100;
+                emoji = '✅';
+                gradientClass = 'from-green-50 to-emerald-100 text-green-700';
+            } else if (bmi >= 25 && bmi < 30) {
+                category = 'Overweight';
+                categoryColor = 'yellow';
+                healthPercentage = 70;
+                emoji = '📈';
+                gradientClass = 'from-yellow-50 to-amber-100 text-yellow-700';
+            } else {
+                category = 'Obese';
+                categoryColor = 'red';
+                healthPercentage = 40;
+                emoji = '🔴';
+                gradientClass = 'from-red-50 to-rose-100 text-red-700';
+            }
+
+            // Ideal weight range
+            const minIdealWeight = 18.5 * (heightInMeters * heightInMeters);
+            const maxIdealWeight = 24.9 * (heightInMeters * heightInMeters);
+            const idealWeightRange = `${Math.round(minIdealWeight)} - ${Math.round(maxIdealWeight)} kg`;
+
+            // Weight difference
+            const midIdealWeight = (minIdealWeight + maxIdealWeight) / 2;
+            const weightDiff = weight - midIdealWeight;
+            let diffText;
+            if (weightDiff > 0) diffText = `${Math.round(weightDiff)} kg to lose ↓`;
+            else if (weightDiff < 0) diffText = `${Math.round(Math.abs(weightDiff))} kg to gain ↑`;
+            else diffText = 'Perfect! 🎯';
+
+            // Body Fat Estimate
+            const bodyFatPercent = estimateBodyFat(bmi, age, currentGender);
+            document.getElementById('body-fat-estimate').textContent = `${bodyFatPercent}%`;
+            updateFatGauge(bodyFatPercent);
+
+            // Update UI
+            document.getElementById('bmi-display').textContent = bmiRounded;
+            document.getElementById('bmi-category').innerHTML = `${emoji} ${category} ${emoji}`;
+            document.getElementById('bmi-category').className = `text-center py-4 rounded-2xl font-bold text-xl transition-all duration-300 bg-gradient-to-r ${gradientClass}`;
+            
+            document.getElementById('result-ideal').textContent = idealWeightRange;
+            document.getElementById('result-diff').textContent = diffText;
+            
+            // Update badge
+            const badge = document.getElementById('bmi-status-badge');
+            badge.textContent = category;
+            badge.className = `px-3 py-1 rounded-full text-xs font-semibold bg-${categoryColor}-100 text-${categoryColor}-700`;
+
+            // Update marker position (BMI range 12-45 for better positioning)
+            const markerPosition = Math.min(Math.max(((bmi - 12) / 33) * 100, 0), 100);
+            document.getElementById('bmi-marker').style.left = `${markerPosition}%`;
+
+            // Update BMI Chart
+            updateBMIChart(bmiRounded);
+            updateHealthTips(category, bmiRounded, bodyFatPercent);
+        }
+
+        // Enhanced BMI Chart
+        function updateBMIChart(currentBMI) {
+            const ctx = document.getElementById('bmiChart').getContext('2d');
+            const categories = ['Underweight', 'Normal', 'Overweight', 'Obese'];
+            const bmiRanges = [18.5, 24.9, 29.9, 40];
+            const colors = ['rgba(59, 130, 246, 0.7)', 'rgba(34, 197, 94, 0.7)', 'rgba(234, 179, 8, 0.7)', 'rgba(239, 68, 68, 0.7)'];
+
+            if (bmiChart) bmiChart.destroy();
+
+            bmiChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: categories,
+                    datasets: [
+                        {
+                            label: 'BMI Range Upper Limit',
+                            data: bmiRanges,
+                            backgroundColor: colors,
+                            borderRadius: 12,
+                            barPercentage: 0.65
+                        },
+                        {
+                            label: 'Your BMI',
+                            data: [currentBMI, currentBMI, currentBMI, currentBMI],
+                            type: 'line',
+                            borderColor: '#4f46e5',
+                            borderWidth: 4,
+                            pointBackgroundColor: '#4f46e5',
+                            pointBorderColor: 'white',
+                            pointRadius: 8,
+                            pointHoverRadius: 12,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 45,
+                            grid: { color: '#eef2ff' },
+                            title: { display: true, text: 'BMI Value', font: { weight: 'bold' } }
+                        }
+                    },
+                    plugins: {
+                        tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw}` } },
+                        legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 10 } }
+                    }
+                }
+            });
+        }
+
+        // Dynamic Health Tips with personalized data
+        function updateHealthTips(category, bmi, bodyFat) {
+            const tipsContainer = document.getElementById('health-tips');
+            let tips = [];
+
+            const getTipStyles = (icon, title, desc, bgGradient) => 
+                `<div class="rounded-2xl p-5 ${bgGradient} border border-white/50 shadow-sm transition-all hover:shadow-md">
+                    <div class="text-4xl mb-3">${icon}</div>
+                    <h3 class="font-extrabold text-gray-800 mb-2 text-lg">${title}</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">${desc}</p>
+                </div>`;
+
+            if (category === 'Underweight') {
+                tips = [
+                    getTipStyles('🥑', 'Nutrient-Dense Foods', 'Add healthy fats: avocados, nuts, olive oil. Increase protein intake for muscle gain.', 'bg-gradient-to-br from-blue-50 to-indigo-50'),
+                    getTipStyles('🏋️', 'Strength Training', 'Focus on resistance exercises 3x weekly to build lean muscle mass effectively.', 'bg-gradient-to-br from-indigo-50 to-purple-50'),
+                    getTipStyles('🥛', 'Smart Snacking', 'Have protein shakes, Greek yogurt, and whole grain snacks between meals.', 'bg-gradient-to-br from-purple-50 to-pink-50')
+                ];
+            } else if (category === 'Normal Weight') {
+                tips = [
+                    getTipStyles('🥗', 'Maintain Balance', 'Continue balanced nutrition with variety. Your BMI is optimal! 🎉', 'bg-gradient-to-br from-green-50 to-emerald-50'),
+                    getTipStyles('🏃', 'Active Lifestyle', '150 mins cardio + strength training weekly keeps you healthy.', 'bg-gradient-to-br from-emerald-50 to-teal-50'),
+                    getTipStyles('💧', 'Hydration', `At ${Math.round(bmi * 30)}ml water daily recommended for your metabolism.`, 'bg-gradient-to-br from-cyan-50 to-blue-50')
+                ];
+            } else if (category === 'Overweight') {
+                tips = [
+                    getTipStyles('🍽️', 'Portion Control', 'Use smaller plates, eat mindfully, and reduce processed foods gradually.', 'bg-gradient-to-br from-yellow-50 to-amber-50'),
+                    getTipStyles('🚶', 'Daily Movement', 'Target 10k steps + 30 min cardio daily. Small steps lead to big changes!', 'bg-gradient-to-br from-amber-50 to-orange-50'),
+                    getTipStyles('📊', 'Track Progress', 'Log meals and weight weekly. Aim for 0.5-1kg loss per week sustainably.', 'bg-gradient-to-br from-orange-50 to-red-50')
+                ];
+            } else {
+                tips = [
+                    getTipStyles('👨‍⚕️', 'Medical Guidance', 'Consult a healthcare professional for a personalized weight management plan.', 'bg-gradient-to-br from-red-50 to-rose-50'),
+                    getTipStyles('🥬', 'Nutritional Reset', 'Focus on whole foods: leafy greens, lean proteins, fiber-rich vegetables.', 'bg-gradient-to-br from-rose-50 to-pink-50'),
+                    getTipStyles('🎯', 'Sustainable Goals', `Start with 5-10% weight loss target. Every ${Math.round(bmi * 0.5)}kg lost improves health!`, 'bg-gradient-to-br from-pink-50 to-purple-50')
+                ];
+            }
+
+            tipsContainer.innerHTML = tips.join('');
+        }
+
+        // Feather icons replacement
+        feather.replace();
+
+        // Initialize
+        syncInputs();
+        calculateBMI();
+
+        // Real-time calculation on input change
+        const inputs = ['input-age', 'input-weight', 'input-height'];
+        inputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', () => calculateBMI());
+        });
+    </script>
+</body>
+</html>
