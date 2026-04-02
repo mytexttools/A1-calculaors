@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BMI Calculator | Advanced Health Analyzer</title>
+    <title>Compound Interest Calculator | Wealth Growth Analyzer</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
     <style>
         * {
             font-family: 'Inter', sans-serif;
@@ -50,25 +49,17 @@
         .input-slider::-webkit-slider-thumb:hover {
             transform: scale(1.2);
         }
-        .gender-btn {
+        .frequency-btn {
             transition: all 0.25s ease;
             border: 2px solid #e2e8f0;
             background: white;
             cursor: pointer;
         }
-        .gender-btn.active {
+        .frequency-btn.active {
             background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
             color: white;
             border-color: transparent;
             box-shadow: 0 8px 20px -8px #6366f1;
-        }
-        .bmi-marker-pulse {
-            animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
         }
         .number-input {
             transition: all 0.2s;
@@ -77,18 +68,41 @@
             transform: scale(1.02);
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
-        .bmi-category-badge {
-            transition: all 0.3s ease;
-        }
         .hover-scale {
             transition: transform 0.2s;
         }
         .hover-scale:hover {
             transform: scale(1.02);
         }
+        .value-highlight {
+            animation: fadeSlideUp 0.5s ease-out;
+        }
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
         input[type="number"]::-webkit-inner-spin-button, 
         input[type="number"]::-webkit-outer-spin-button {
             opacity: 0.5;
+        }
+        .progress-bar {
+            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        .back-button {
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(-2px);
         }
     </style>
 </head>
@@ -96,198 +110,251 @@
 
     <div class="max-w-7xl mx-auto">
         
-        <!-- Header with animated gradient -->
-        <div class="text-center mb-10">
-            <div class="inline-block mb-3">
+        <!-- Back Button & Header Row -->
+        <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+            <a href="index.html" class="back-button inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-white font-medium transition-all shadow-md hover:shadow-lg">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                Back to Home
+            </a>
+            <div class="text-right">
                 <div class="bg-white/10 backdrop-blur-sm rounded-full px-4 py-1 inline-flex items-center gap-2">
-                    <span class="text-yellow-300 text-sm">⚡</span>
-                    <span class="text-white/80 text-sm font-medium">AI-Powered Health Analyzer</span>
+                    <span class="text-yellow-300 text-sm">💰</span>
+                    <span class="text-white/80 text-sm font-medium">Wealth Growth Calculator</span>
                 </div>
             </div>
+        </div>
+        
+        <!-- Header -->
+        <div class="text-center mb-10">
             <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-3 tracking-tight bg-gradient-to-r from-white via-indigo-200 to-purple-200 bg-clip-text text-transparent">
-                BMI Calculator
+                Compound Interest Calculator
             </h1>
-            <p class="text-indigo-200 text-lg max-w-2xl mx-auto">Your comprehensive body composition analysis with personalized insights</p>
+            <p class="text-indigo-200 text-lg max-w-2xl mx-auto">Watch your money grow exponentially with the power of compounding</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             
-            <!-- Input Section - Enhanced -->
+            <!-- Input Section -->
             <div class="glass-card p-7 lg:p-8">
                 <div class="flex items-center gap-3 mb-7">
                     <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                        <span class="text-white text-xl">📋</span>
+                        <span class="text-white text-xl">📊</span>
                     </div>
-                    <h2 class="text-2xl font-bold text-gray-800">Your Details</h2>
+                    <h2 class="text-2xl font-bold text-gray-800">Investment Details</h2>
                 </div>
                 
-                <!-- Gender Selection with icons animation -->
+                <!-- Principal Amount -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <span>💰</span> Principal Amount
+                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">₹</span>
+                    </label>
+                    <input type="number" id="input-principal" value="10000" 
+                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input"
+                        min="0" max="10000000" step="1000">
+                    <input type="range" id="slider-principal" min="0" max="1000000" step="1000" value="10000"
+                        class="input-slider mt-3">
+                </div>
+
+                <!-- Annual Interest Rate -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <span>📈</span> Annual Interest Rate
+                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">% p.a.</span>
+                    </label>
+                    <input type="number" id="input-rate" value="8" 
+                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input"
+                        min="0" max="30" step="0.5">
+                    <input type="range" id="slider-rate" min="0" max="30" step="0.5" value="8"
+                        class="input-slider mt-3">
+                </div>
+
+                <!-- Time Period -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <span>⏱️</span> Time Period
+                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">Years</span>
+                    </label>
+                    <input type="number" id="input-years" value="10" 
+                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input"
+                        min="0" max="50" step="1">
+                    <input type="range" id="slider-years" min="0" max="50" step="1" value="10"
+                        class="input-slider mt-3">
+                </div>
+
+                <!-- Additional Monthly Contribution -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <span>➕</span> Monthly Contribution
+                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">₹/month</span>
+                    </label>
+                    <input type="number" id="input-monthly" value="1000" 
+                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input"
+                        min="0" max="100000" step="500">
+                    <input type="range" id="slider-monthly" min="0" max="50000" step="500" value="1000"
+                        class="input-slider mt-3">
+                </div>
+
+                <!-- Compounding Frequency -->
                 <div class="mb-7">
                     <label class="block text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
-                        <span>👤</span> Gender
+                        <span>🔄</span> Compounding Frequency
                     </label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <button id="btn-male" class="gender-btn active py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 text-gray-700" onclick="selectGender('male')">
-                            <span>👨</span> Male
+                    <div class="grid grid-cols-3 gap-3">
+                        <button class="frequency-btn py-3 rounded-xl font-semibold text-sm" data-frequency="12" onclick="setFrequency('monthly', this)">
+                            📅 Monthly
                         </button>
-                        <button id="btn-female" class="gender-btn py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 text-gray-700" onclick="selectGender('female')">
-                            <span>👩</span> Female
+                        <button class="frequency-btn py-3 rounded-xl font-semibold text-sm" data-frequency="4" onclick="setFrequency('quarterly', this)">
+                            📆 Quarterly
+                        </button>
+                        <button class="frequency-btn active py-3 rounded-xl font-semibold text-sm" data-frequency="1" onclick="setFrequency('yearly', this)">
+                            📅 Yearly
                         </button>
                     </div>
                 </div>
 
-                <!-- Age with better styling -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                        <span>🎂</span> Age (Years)
-                    </label>
-                    <input type="number" id="input-age" value="25" 
-                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input transition-all"
-                        min="1" max="120">
-                    <input type="range" id="slider-age" min="1" max="120" step="1" value="25"
-                        class="input-slider mt-3">
-                </div>
-
-                <!-- Weight with unit indicator -->
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                        <span>⚖️</span> Weight
-                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">kg</span>
-                    </label>
-                    <input type="number" id="input-weight" value="70" 
-                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input"
-                        min="20" max="200" step="0.5">
-                    <input type="range" id="slider-weight" min="20" max="200" step="0.5" value="70"
-                        class="input-slider mt-3">
-                </div>
-
-                <!-- Height with unit indicator -->
-                <div class="mb-7">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
-                        <span>📏</span> Height
-                        <span class="text-xs bg-gray-100 px-2 py-0.5 rounded-full">cm</span>
-                    </label>
-                    <input type="number" id="input-height" value="170" 
-                        class="w-full p-3.5 border-2 border-gray-200 rounded-xl focus:border-indigo-500 focus:outline-none text-lg font-semibold number-input"
-                        min="50" max="250">
-                    <input type="range" id="slider-height" min="50" max="250" step="1" value="170"
-                        class="input-slider mt-3">
-                </div>
-
-                <!-- Calculate Button with ripple effect -->
-                <button onclick="calculateBMI()" 
+                <!-- Calculate Button -->
+                <button onclick="calculateCompoundInterest()" 
                     class="w-full py-4 rounded-xl text-white font-bold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-3">
-                    <span>✨</span> ANALYZE MY BMI <span>✨</span>
+                    <span>✨</span> CALCULATE WEALTH <span>✨</span>
                 </button>
 
-                <!-- Quick Info -->
+                <!-- Info Text -->
                 <div class="mt-6 text-center text-xs text-gray-400 border-t pt-4">
-                    <span>BMI = weight(kg) / height(m)² | World Health Organization Standards</span>
+                    <span>Compound Interest = P(1 + r/n)^(nt) + PMT × ((1 + r/n)^(nt) - 1) / (r/n)</span>
                 </div>
             </div>
 
-            <!-- Results Section - Enhanced -->
+            <!-- Results Section -->
             <div class="space-y-6">
                 
-                <!-- Main BMI Card with animated display -->
+                <!-- Main Results Card -->
                 <div class="glass-card p-7 hover-scale">
                     <div class="flex items-center justify-between mb-5">
                         <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
-                            <span>📊</span> BMI Result
+                            <span>📈</span> Wealth Projection
                         </h2>
-                        <div id="bmi-status-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600">Ready</div>
+                        <div id="wealth-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700">Active</div>
                     </div>
                     
+                    <!-- Final Amount -->
                     <div class="text-center mb-6">
                         <div class="relative inline-block">
-                            <div id="bmi-display" class="text-7xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">0.0</div>
-                            <div class="absolute -top-2 -right-8 text-2xl">🏷️</div>
+                            <div id="final-amount" class="text-6xl font-black bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent mb-2">₹0</div>
+                            <div class="absolute -top-2 -right-8 text-2xl">🏆</div>
                         </div>
-                        <p class="text-gray-500 font-medium">Body Mass Index</p>
+                        <p class="text-gray-500 font-medium">Total Value After Investment Period</p>
                     </div>
 
-                    <!-- Enhanced BMI Scale -->
-                    <div class="bg-gray-100 rounded-2xl p-5 mb-5">
-                        <div class="flex justify-between items-center mb-3 text-xs font-semibold">
-                            <span class="text-blue-600">Underweight</span>
-                            <span class="text-green-600">Normal</span>
-                            <span class="text-yellow-600">Overweight</span>
-                            <span class="text-red-600">Obese</span>
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-3 gap-3 mb-6">
+                        <div class="bg-gray-50 rounded-xl p-3 text-center">
+                            <p class="text-xs text-gray-500 uppercase">Total Invested</p>
+                            <p class="text-lg font-bold text-gray-800" id="total-invested">₹0</p>
                         </div>
-                        <div class="h-3 rounded-full bg-gradient-to-r from-blue-400 via-green-400 via-yellow-400 to-red-500 relative">
-                            <div id="bmi-marker" class="absolute top-1/2 transform -translate-y-1/2 w-5 h-5 bg-white border-3 border-indigo-600 rounded-full shadow-lg bmi-marker-pulse" style="left: 0%;"></div>
+                        <div class="bg-gray-50 rounded-xl p-3 text-center">
+                            <p class="text-xs text-gray-500 uppercase">Total Interest</p>
+                            <p class="text-lg font-bold text-emerald-600" id="total-interest">₹0</p>
                         </div>
-                        <div class="flex justify-between mt-2 text-xs text-gray-500">
-                            <span>&lt;18.5</span>
-                            <span>18.5–24.9</span>
-                            <span>25–29.9</span>
-                            <span>≥30</span>
+                        <div class="bg-gray-50 rounded-xl p-3 text-center">
+                            <p class="text-xs text-gray-500 uppercase">Interest %</p>
+                            <p class="text-lg font-bold text-purple-600" id="interest-percent">0%</p>
                         </div>
                     </div>
 
-                    <div id="bmi-category" class="text-center py-4 rounded-2xl font-bold text-xl transition-all duration-300 bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700">
-                        Calculating...
-                    </div>
-                </div>
-
-                <!-- Enhanced Stats Cards with icons -->
-                <div class="grid grid-cols-2 gap-5">
-                    <div class="glass-card p-5 text-center hover-scale">
-                        <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
-                            <span class="text-2xl">🎯</span>
+                    <!-- Progress Bar -->
+                    <div class="mb-4">
+                        <div class="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>Principal</span>
+                            <span id="growth-indicator">0% Growth</span>
                         </div>
-                        <p class="text-xs text-gray-500 uppercase font-semibold tracking-wide">Ideal Range</p>
-                        <p class="text-xl font-black text-emerald-600 mt-1" id="result-ideal">0 - 0 kg</p>
-                    </div>
-                    <div class="glass-card p-5 text-center hover-scale">
-                        <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mx-auto mb-3">
-                            <span class="text-2xl">📉</span>
-                        </div>
-                        <p class="text-xs text-gray-500 uppercase font-semibold tracking-wide">Adjustment</p>
-                        <p class="text-xl font-black text-orange-600 mt-1" id="result-diff">0 kg</p>
-                    </div>
-                </div>
-
-                <!-- Body Fat Estimate (New Feature) -->
-                <div class="glass-card p-5">
-                    <div class="flex items-center justify-between mb-3">
-                        <h3 class="font-bold text-gray-800 flex items-center gap-2">
-                            <span>💪</span> Body Fat Estimate
-                        </h3>
-                        <span class="text-xs bg-gray-100 px-2 py-1 rounded-full">Navy Method</span>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <p class="text-3xl font-black text-indigo-600" id="body-fat-estimate">--%</p>
-                            <p class="text-xs text-gray-500">Estimated body fat percentage</p>
-                        </div>
-                        <div class="w-24 h-24">
-                            <canvas id="fatGaugeChart" width="100" height="100"></canvas>
+                        <div class="h-3 bg-gray-100 rounded-full overflow-hidden">
+                            <div id="growth-bar" class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full progress-bar" style="width: 0%"></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- BMI Trends Chart -->
+                <!-- Year by Year Breakdown Card -->
                 <div class="glass-card p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
-                        <span>📈</span> BMI Categories Overview
-                    </h2>
-                    <div class="w-full h-64">
-                        <canvas id="bmiChart"></canvas>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-100 flex items-center justify-center">
+                            <span class="text-indigo-600 text-sm">📅</span>
+                        </div>
+                        <h2 class="text-lg font-bold text-gray-800">Year-by-Year Growth</h2>
+                    </div>
+                    <div class="overflow-x-auto max-h-64 overflow-y-auto">
+                        <table class="w-full text-sm" id="yearly-table">
+                            <thead class="bg-gray-50 sticky top-0">
+                                <tr class="border-b border-gray-200">
+                                    <th class="text-left py-2 px-2 font-semibold text-gray-600">Year</th>
+                                    <th class="text-right py-2 px-2 font-semibold text-gray-600">Start Balance</th>
+                                    <th class="text-right py-2 px-2 font-semibold text-gray-600">End Balance</th>
+                                    <th class="text-right py-2 px-2 font-semibold text-gray-600">Interest Earned</th>
+                                </tr>
+                            </thead>
+                            <tbody id="yearly-tbody">
+                                <tr><td colspan="4" class="text-center py-4 text-gray-400">Calculate to see breakdown</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Enhanced Health Tips Section with dynamic backgrounds -->
+        <!-- Bottom Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+            
+            <!-- Growth Chart -->
+            <div class="glass-card p-7">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                        <span class="text-white text-xl">📊</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800">Wealth Growth Curve</h2>
+                </div>
+                <div class="w-full h-80">
+                    <canvas id="growthChart"></canvas>
+                </div>
+                <p class="text-xs text-center text-gray-400 mt-3">Visualizing the power of compound interest over time</p>
+            </div>
+
+            <!-- Contribution vs Interest Pie Chart -->
+            <div class="glass-card p-7">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                        <span class="text-white text-xl">🥧</span>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-800">Investment Composition</h2>
+                </div>
+                <div class="flex justify-center">
+                    <div class="w-64 h-64">
+                        <canvas id="compositionChart"></canvas>
+                    </div>
+                </div>
+                <div class="flex justify-center gap-6 mt-4 flex-wrap">
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-full bg-indigo-500"></div>
+                        <span class="text-sm text-gray-600">Your Contributions</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded-full bg-emerald-500"></div>
+                        <span class="text-sm text-gray-600">Interest Earned</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Financial Wisdom Section -->
         <div class="glass-card p-7 mt-8">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
                     <span class="text-white text-xl">💡</span>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-800">Personalized Health Insights</h2>
+                <h2 class="text-2xl font-bold text-gray-800">Financial Wisdom</h2>
             </div>
-            <div id="health-tips" class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <div id="financial-tips" class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <!-- Tips populated dynamically -->
             </div>
         </div>
@@ -295,261 +362,375 @@
 
     <script>
         // Chart instances
-        let bmiChart = null;
-        let fatGaugeChart = null;
-        let currentGender = 'male';
+        let growthChart = null;
+        let compositionChart = null;
+        let currentFrequency = 1; // 1 = yearly, 4 = quarterly, 12 = monthly
+        let frequencyName = 'yearly';
 
-        // Sync inputs with sliders
+        // Sync sliders with inputs
         function syncInputs() {
-            const inputs = ['age', 'weight', 'height'];
-            inputs.forEach(param => {
-                const input = document.getElementById(`input-${param}`);
-                const slider = document.getElementById(`slider-${param}`);
+            const mappings = [
+                { input: 'principal', slider: 'slider-principal' },
+                { input: 'rate', slider: 'slider-rate' },
+                { input: 'years', slider: 'slider-years' },
+                { input: 'monthly', slider: 'slider-monthly' }
+            ];
+            
+            mappings.forEach(m => {
+                const input = document.getElementById(`input-${m.input}`);
+                const slider = document.getElementById(m.slider);
                 if (input && slider) {
-                    slider.addEventListener('input', () => input.value = slider.value);
-                    input.addEventListener('input', () => slider.value = input.value);
+                    slider.addEventListener('input', () => {
+                        input.value = slider.value;
+                        calculateCompoundInterest();
+                    });
+                    input.addEventListener('input', () => {
+                        slider.value = input.value;
+                        calculateCompoundInterest();
+                    });
                 }
             });
         }
 
-        // Select Gender
-        function selectGender(gender) {
-            currentGender = gender;
-            const btnMale = document.getElementById('btn-male');
-            const btnFemale = document.getElementById('btn-female');
+        // Set compounding frequency
+        function setFrequency(type, element) {
+            const buttons = document.querySelectorAll('.frequency-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
             
-            if (gender === 'male') {
-                btnMale.classList.add('active');
-                btnFemale.classList.remove('active');
-            } else {
-                btnFemale.classList.add('active');
-                btnMale.classList.remove('active');
+            switch(type) {
+                case 'monthly':
+                    currentFrequency = 12;
+                    frequencyName = 'monthly';
+                    break;
+                case 'quarterly':
+                    currentFrequency = 4;
+                    frequencyName = 'quarterly';
+                    break;
+                case 'yearly':
+                    currentFrequency = 1;
+                    frequencyName = 'yearly';
+                    break;
             }
-            calculateBMI();
+            calculateCompoundInterest();
         }
 
-        // Estimate Body Fat (Navy Method simplified)
-        function estimateBodyFat(bmi, age, gender) {
-            let bodyFat;
-            if (gender === 'male') {
-                bodyFat = (1.20 * bmi) + (0.23 * age) - 16.2;
-            } else {
-                bodyFat = (1.20 * bmi) + (0.23 * age) - 5.4;
-            }
-            bodyFat = Math.min(Math.max(bodyFat, 5), 45);
-            return Math.round(bodyFat * 10) / 10;
-        }
-
-        // Update Fat Gauge
-        function updateFatGauge(percentage) {
-            const canvas = document.getElementById('fatGaugeChart');
-            if (!canvas) return;
+        // Calculate compound interest with monthly contributions
+        function calculateCompoundInterest() {
+            const principal = parseFloat(document.getElementById('input-principal').value) || 0;
+            const annualRate = parseFloat(document.getElementById('input-rate').value) || 0;
+            const years = parseFloat(document.getElementById('input-years').value) || 0;
+            const monthlyContribution = parseFloat(document.getElementById('input-monthly').value) || 0;
             
-            const ctx = canvas.getContext('2d');
-            if (fatGaugeChart) fatGaugeChart.destroy();
+            const r = annualRate / 100;
+            const n = currentFrequency;
             
-            fatGaugeChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    datasets: [{
-                        data: [percentage, 100 - percentage],
-                        backgroundColor: ['#6366f1', '#e2e8f0'],
-                        borderWidth: 0,
-                        cutout: '70%'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: { legend: { display: false }, tooltip: { enabled: false } }
+            let finalAmount = 0;
+            let yearlyData = [];
+            
+            // Calculate future value of principal
+            const principalFuture = principal * Math.pow(1 + r/n, n * years);
+            
+            // Calculate future value of monthly contributions
+            let contributionFuture = 0;
+            if (monthlyContribution > 0) {
+                const monthlyRate = r / 12;
+                const totalMonths = years * 12;
+                if (monthlyRate > 0) {
+                    contributionFuture = monthlyContribution * (Math.pow(1 + monthlyRate, totalMonths) - 1) / monthlyRate;
+                } else {
+                    contributionFuture = monthlyContribution * totalMonths;
                 }
-            });
-        }
-
-        // Calculate BMI and all metrics
-        function calculateBMI() {
-            const weight = parseFloat(document.getElementById('input-weight').value);
-            const height = parseFloat(document.getElementById('input-height').value);
-            const age = parseFloat(document.getElementById('input-age').value);
-            const heightInMeters = height / 100;
-            const bmi = weight / (heightInMeters * heightInMeters);
-            const bmiRounded = Math.round(bmi * 10) / 10;
-
-            // Enhanced category with severity
-            let category, categoryColor, healthPercentage, gradientClass, emoji;
-            if (bmi < 18.5) {
-                category = 'Underweight';
-                categoryColor = 'blue';
-                healthPercentage = 55;
-                emoji = '⚠️';
-                gradientClass = 'from-blue-50 to-blue-100 text-blue-700';
-            } else if (bmi >= 18.5 && bmi < 25) {
-                category = 'Normal Weight';
-                categoryColor = 'green';
-                healthPercentage = 100;
-                emoji = '✅';
-                gradientClass = 'from-green-50 to-emerald-100 text-green-700';
-            } else if (bmi >= 25 && bmi < 30) {
-                category = 'Overweight';
-                categoryColor = 'yellow';
-                healthPercentage = 70;
-                emoji = '📈';
-                gradientClass = 'from-yellow-50 to-amber-100 text-yellow-700';
-            } else {
-                category = 'Obese';
-                categoryColor = 'red';
-                healthPercentage = 40;
-                emoji = '🔴';
-                gradientClass = 'from-red-50 to-rose-100 text-red-700';
             }
-
-            // Ideal weight range
-            const minIdealWeight = 18.5 * (heightInMeters * heightInMeters);
-            const maxIdealWeight = 24.9 * (heightInMeters * heightInMeters);
-            const idealWeightRange = `${Math.round(minIdealWeight)} - ${Math.round(maxIdealWeight)} kg`;
-
-            // Weight difference
-            const midIdealWeight = (minIdealWeight + maxIdealWeight) / 2;
-            const weightDiff = weight - midIdealWeight;
-            let diffText;
-            if (weightDiff > 0) diffText = `${Math.round(weightDiff)} kg to lose ↓`;
-            else if (weightDiff < 0) diffText = `${Math.round(Math.abs(weightDiff))} kg to gain ↑`;
-            else diffText = 'Perfect! 🎯';
-
-            // Body Fat Estimate
-            const bodyFatPercent = estimateBodyFat(bmi, age, currentGender);
-            document.getElementById('body-fat-estimate').textContent = `${bodyFatPercent}%`;
-            updateFatGauge(bodyFatPercent);
-
+            
+            finalAmount = principalFuture + contributionFuture;
+            
+            // Calculate total invested
+            const totalInvested = principal + (monthlyContribution * years * 12);
+            const totalInterest = finalAmount - totalInvested;
+            const interestPercent = totalInvested > 0 ? ((totalInterest / totalInvested) * 100).toFixed(1) : 0;
+            
+            // Yearly breakdown for chart and table
+            yearlyData = [];
+            for (let year = 0; year <= years; year++) {
+                const principalAtYear = principal * Math.pow(1 + r/n, n * year);
+                let contributionsAtYear = 0;
+                if (monthlyContribution > 0) {
+                    const monthsPassed = year * 12;
+                    const monthlyRate = r / 12;
+                    if (monthlyRate > 0) {
+                        contributionsAtYear = monthlyContribution * (Math.pow(1 + monthlyRate, monthsPassed) - 1) / monthlyRate;
+                    } else {
+                        contributionsAtYear = monthlyContribution * monthsPassed;
+                    }
+                }
+                const totalAtYear = principalAtYear + contributionsAtYear;
+                const investedAtYear = principal + (monthlyContribution * year * 12);
+                const interestAtYear = totalAtYear - investedAtYear;
+                
+                yearlyData.push({
+                    year: year,
+                    startBalance: year === 0 ? principal : yearlyData[year-1]?.endBalance || principal,
+                    endBalance: totalAtYear,
+                    interestEarned: interestAtYear,
+                    invested: investedAtYear
+                });
+            }
+            
             // Update UI
-            document.getElementById('bmi-display').textContent = bmiRounded;
-            document.getElementById('bmi-category').innerHTML = `${emoji} ${category} ${emoji}`;
-            document.getElementById('bmi-category').className = `text-center py-4 rounded-2xl font-bold text-xl transition-all duration-300 bg-gradient-to-r ${gradientClass}`;
+            document.getElementById('final-amount').textContent = formatCurrency(finalAmount);
+            document.getElementById('total-invested').textContent = formatCurrency(totalInvested);
+            document.getElementById('total-interest').textContent = formatCurrency(totalInterest);
+            document.getElementById('interest-percent').textContent = `${interestPercent}%`;
             
-            document.getElementById('result-ideal').textContent = idealWeightRange;
-            document.getElementById('result-diff').textContent = diffText;
+            // Update progress bar
+            const growthPercent = totalInvested > 0 ? Math.min((finalAmount / totalInvested - 1) * 100, 100) : 0;
+            document.getElementById('growth-bar').style.width = `${Math.min(growthPercent, 100)}%`;
+            document.getElementById('growth-indicator').textContent = `${growthPercent.toFixed(1)}% Growth`;
             
-            // Update badge
-            const badge = document.getElementById('bmi-status-badge');
-            badge.textContent = category;
-            badge.className = `px-3 py-1 rounded-full text-xs font-semibold bg-${categoryColor}-100 text-${categoryColor}-700`;
-
-            // Update marker position (BMI range 12-45 for better positioning)
-            const markerPosition = Math.min(Math.max(((bmi - 12) / 33) * 100, 0), 100);
-            document.getElementById('bmi-marker').style.left = `${markerPosition}%`;
-
-            // Update BMI Chart
-            updateBMIChart(bmiRounded);
-            updateHealthTips(category, bmiRounded, bodyFatPercent);
+            // Update badge based on interest
+            const badge = document.getElementById('wealth-badge');
+            if (totalInterest > totalInvested) {
+                badge.textContent = '🚀 Doubled!';
+                badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700';
+            } else if (totalInterest > 0) {
+                badge.textContent = '📈 Growing';
+                badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-indigo-100 text-indigo-700';
+            } else {
+                badge.textContent = '💤 No Interest';
+                badge.className = 'px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-600';
+            }
+            
+            // Update yearly table
+            updateYearlyTable(yearlyData);
+            
+            // Update charts
+            updateGrowthChart(yearlyData);
+            updateCompositionChart(totalInvested, totalInterest);
+            updateFinancialTips(annualRate, years, monthlyContribution, totalInterest, totalInvested);
         }
-
-        // Enhanced BMI Chart
-        function updateBMIChart(currentBMI) {
-            const ctx = document.getElementById('bmiChart').getContext('2d');
-            const categories = ['Underweight', 'Normal', 'Overweight', 'Obese'];
-            const bmiRanges = [18.5, 24.9, 29.9, 40];
-            const colors = ['rgba(59, 130, 246, 0.7)', 'rgba(34, 197, 94, 0.7)', 'rgba(234, 179, 8, 0.7)', 'rgba(239, 68, 68, 0.7)'];
-
-            if (bmiChart) bmiChart.destroy();
-
-            bmiChart = new Chart(ctx, {
-                type: 'bar',
+        
+        // Update yearly breakdown table
+        function updateYearlyTable(yearlyData) {
+            const tbody = document.getElementById('yearly-tbody');
+            if (yearlyData.length <= 1) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center py-4 text-gray-400">Enter investment details to see breakdown</td></tr>';
+                return;
+            }
+            tbody.innerHTML = yearlyData.slice(1).map(data => `
+                <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                    <td class="py-2 px-2 font-semibold text-gray-700">Year ${data.year}</td>
+                    <td class="text-right py-2 px-2 text-gray-600">${formatCurrency(data.startBalance)}</td>
+                    <td class="text-right py-2 px-2 font-semibold text-indigo-600">${formatCurrency(data.endBalance)}</td>
+                    <td class="text-right py-2 px-2 text-emerald-600">+${formatCurrency(data.interestEarned)}</td>
+                </tr>
+            `).join('');
+        }
+        
+        // Update growth chart
+        function updateGrowthChart(yearlyData) {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            const years = yearlyData.map(d => `Year ${d.year}`);
+            const balances = yearlyData.map(d => d.endBalance);
+            const invested = yearlyData.map(d => d.invested);
+            
+            if (growthChart) growthChart.destroy();
+            
+            growthChart = new Chart(ctx, {
+                type: 'line',
                 data: {
-                    labels: categories,
+                    labels: years,
                     datasets: [
                         {
-                            label: 'BMI Range Upper Limit',
-                            data: bmiRanges,
-                            backgroundColor: colors,
-                            borderRadius: 12,
-                            barPercentage: 0.65
+                            label: 'Total Value',
+                            data: balances,
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            borderWidth: 3,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#6366f1'
                         },
                         {
-                            label: 'Your BMI',
-                            data: [currentBMI, currentBMI, currentBMI, currentBMI],
-                            type: 'line',
-                            borderColor: '#4f46e5',
-                            borderWidth: 4,
-                            pointBackgroundColor: '#4f46e5',
-                            pointBorderColor: 'white',
-                            pointRadius: 8,
-                            pointHoverRadius: 12,
-                            tension: 0.1
+                            label: 'Total Invested',
+                            data: invested,
+                            borderColor: '#a855f7',
+                            backgroundColor: 'rgba(168, 85, 247, 0.05)',
+                            borderDash: [5, 5],
+                            tension: 0.4,
+                            borderWidth: 2,
+                            fill: false
                         }
                     ]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${formatCurrency(context.raw)}`;
+                                }
+                            }
+                        },
+                        legend: { position: 'top' }
+                    },
                     scales: {
                         y: {
-                            beginAtZero: true,
-                            max: 45,
-                            grid: { color: '#eef2ff' },
-                            title: { display: true, text: 'BMI Value', font: { weight: 'bold' } }
+                            ticks: {
+                                callback: function(value) {
+                                    return formatCurrencyShort(value);
+                                }
+                            }
                         }
-                    },
-                    plugins: {
-                        tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw}` } },
-                        legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 10 } }
                     }
                 }
             });
         }
-
-        // Dynamic Health Tips with personalized data
-        function updateHealthTips(category, bmi, bodyFat) {
-            const tipsContainer = document.getElementById('health-tips');
-            let tips = [];
-
-            const getTipStyles = (icon, title, desc, bgGradient) => 
-                `<div class="rounded-2xl p-5 ${bgGradient} border border-white/50 shadow-sm transition-all hover:shadow-md">
-                    <div class="text-4xl mb-3">${icon}</div>
-                    <h3 class="font-extrabold text-gray-800 mb-2 text-lg">${title}</h3>
-                    <p class="text-sm text-gray-600 leading-relaxed">${desc}</p>
-                </div>`;
-
-            if (category === 'Underweight') {
-                tips = [
-                    getTipStyles('🥑', 'Nutrient-Dense Foods', 'Add healthy fats: avocados, nuts, olive oil. Increase protein intake for muscle gain.', 'bg-gradient-to-br from-blue-50 to-indigo-50'),
-                    getTipStyles('🏋️', 'Strength Training', 'Focus on resistance exercises 3x weekly to build lean muscle mass effectively.', 'bg-gradient-to-br from-indigo-50 to-purple-50'),
-                    getTipStyles('🥛', 'Smart Snacking', 'Have protein shakes, Greek yogurt, and whole grain snacks between meals.', 'bg-gradient-to-br from-purple-50 to-pink-50')
-                ];
-            } else if (category === 'Normal Weight') {
-                tips = [
-                    getTipStyles('🥗', 'Maintain Balance', 'Continue balanced nutrition with variety. Your BMI is optimal! 🎉', 'bg-gradient-to-br from-green-50 to-emerald-50'),
-                    getTipStyles('🏃', 'Active Lifestyle', '150 mins cardio + strength training weekly keeps you healthy.', 'bg-gradient-to-br from-emerald-50 to-teal-50'),
-                    getTipStyles('💧', 'Hydration', `At ${Math.round(bmi * 30)}ml water daily recommended for your metabolism.`, 'bg-gradient-to-br from-cyan-50 to-blue-50')
-                ];
-            } else if (category === 'Overweight') {
-                tips = [
-                    getTipStyles('🍽️', 'Portion Control', 'Use smaller plates, eat mindfully, and reduce processed foods gradually.', 'bg-gradient-to-br from-yellow-50 to-amber-50'),
-                    getTipStyles('🚶', 'Daily Movement', 'Target 10k steps + 30 min cardio daily. Small steps lead to big changes!', 'bg-gradient-to-br from-amber-50 to-orange-50'),
-                    getTipStyles('📊', 'Track Progress', 'Log meals and weight weekly. Aim for 0.5-1kg loss per week sustainably.', 'bg-gradient-to-br from-orange-50 to-red-50')
-                ];
-            } else {
-                tips = [
-                    getTipStyles('👨‍⚕️', 'Medical Guidance', 'Consult a healthcare professional for a personalized weight management plan.', 'bg-gradient-to-br from-red-50 to-rose-50'),
-                    getTipStyles('🥬', 'Nutritional Reset', 'Focus on whole foods: leafy greens, lean proteins, fiber-rich vegetables.', 'bg-gradient-to-br from-rose-50 to-pink-50'),
-                    getTipStyles('🎯', 'Sustainable Goals', `Start with 5-10% weight loss target. Every ${Math.round(bmi * 0.5)}kg lost improves health!`, 'bg-gradient-to-br from-pink-50 to-purple-50')
-                ];
-            }
-
-            tipsContainer.innerHTML = tips.join('');
+        
+        // Update composition pie chart
+        function updateCompositionChart(totalInvested, totalInterest) {
+            const ctx = document.getElementById('compositionChart').getContext('2d');
+            if (compositionChart) compositionChart.destroy();
+            
+            compositionChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Your Contributions', 'Interest Earned'],
+                    datasets: [{
+                        data: [totalInvested, Math.max(totalInterest, 0)],
+                        backgroundColor: ['#6366f1', '#10b981'],
+                        borderWidth: 0,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '55%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const value = context.raw;
+                                    const total = totalInvested + Math.max(totalInterest, 0);
+                                    const percent = ((value / total) * 100).toFixed(1);
+                                    return `${context.label}: ${formatCurrency(value)} (${percent}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
-
-        // Feather icons replacement
-        feather.replace();
-
+        
+        // Update financial tips based on calculations
+        function updateFinancialTips(rate, years, monthly, totalInterest, totalInvested) {
+            const tipsContainer = document.getElementById('financial-tips');
+            
+            let tips = [];
+            
+            if (rate >= 10) {
+                tips.push({
+                    icon: '🚀',
+                    title: 'High Return Rate!',
+                    desc: `Your ${rate}% return is excellent. Consider diversifying to maintain this growth sustainably.`,
+                    bg: 'from-green-50 to-emerald-50'
+                });
+            } else if (rate >= 6) {
+                tips.push({
+                    icon: '📈',
+                    title: 'Solid Returns',
+                    desc: `${rate}% is a healthy return. Consistent investing will build significant wealth over time.`,
+                    bg: 'from-indigo-50 to-purple-50'
+                });
+            } else {
+                tips.push({
+                    icon: '🐢',
+                    title: 'Conservative Growth',
+                    desc: `At ${rate}%, consider exploring higher-yield options like index funds for better long-term results.`,
+                    bg: 'from-blue-50 to-cyan-50'
+                });
+            }
+            
+            if (years >= 15) {
+                tips.push({
+                    icon: '⏳',
+                    title: 'Long-Term Advantage',
+                    desc: `${years} years of compounding is powerful! Your money has time to grow exponentially.`,
+                    bg: 'from-purple-50 to-pink-50'
+                });
+            } else if (years >= 5) {
+                tips.push({
+                    icon: '🎯',
+                    title: 'Mid-Term Strategy',
+                    desc: `${years} years is good. Increasing contributions now will dramatically boost your final amount.`,
+                    bg: 'from-amber-50 to-orange-50'
+                });
+            } else {
+                tips.push({
+                    icon: '⚡',
+                    title: 'Short-Term Horizon',
+                    desc: `With ${years} years, consider more aggressive contributions or higher-yield investments.`,
+                    bg: 'from-yellow-50 to-amber-50'
+                });
+            }
+            
+            if (monthly > 0) {
+                tips.push({
+                    icon: '💪',
+                    title: 'Power of SIP',
+                    desc: `Your ₹${monthly.toLocaleString()}/month contribution will grow significantly. Increase it by 10% yearly for even better results.`,
+                    bg: 'from-emerald-50 to-teal-50'
+                });
+            } else {
+                tips.push({
+                    icon: '➕',
+                    title: 'Add Monthly Contributions',
+                    desc: 'Even small monthly additions can dramatically increase your final wealth through dollar-cost averaging.',
+                    bg: 'from-cyan-50 to-blue-50'
+                });
+            }
+            
+            tipsContainer.innerHTML = tips.map(tip => `
+                <div class="rounded-2xl p-5 bg-gradient-to-br ${tip.bg} border border-white/50 shadow-sm transition-all hover:shadow-md">
+                    <div class="text-4xl mb-3">${tip.icon}</div>
+                    <h3 class="font-extrabold text-gray-800 mb-2 text-lg">${tip.title}</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">${tip.desc}</p>
+                </div>
+            `).join('');
+        }
+        
+        // Format currency
+        function formatCurrency(value) {
+            if (isNaN(value)) return '₹0';
+            if (value >= 10000000) {
+                return `₹${(value / 10000000).toFixed(2)}Cr`;
+            } else if (value >= 100000) {
+                return `₹${(value / 100000).toFixed(2)}L`;
+            } else if (value >= 1000) {
+                return `₹${(value / 1000).toFixed(1)}K`;
+            }
+            return `₹${Math.round(value).toLocaleString()}`;
+        }
+        
+        function formatCurrencyShort(value) {
+            if (value >= 10000000) return `${(value / 10000000).toFixed(1)}Cr`;
+            if (value >= 100000) return `${(value / 100000).toFixed(1)}L`;
+            if (value >= 1000) return `${(value / 1000).toFixed(0)}K`;
+            return value.toLocaleString();
+        }
+        
         // Initialize
-        syncInputs();
-        calculateBMI();
-
-        // Real-time calculation on input change
-        const inputs = ['input-age', 'input-weight', 'input-height'];
-        inputs.forEach(id => {
-            document.getElementById(id).addEventListener('input', () => calculateBMI());
-        });
+        function init() {
+            syncInputs();
+            calculateCompoundInterest();
+        }
+        
+        init();
     </script>
 </body>
 </html>
